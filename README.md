@@ -4,4 +4,5 @@ This is an Smart Expense Tracker which auto detects payment screenshot built usi
 how to contribute:-
 
 1) go to your repository and fork the repository
-2)when you see the forked repository in your own profile clone that forked repository into a local directory
+
+2) when you see the forked repository in your own profile clone that forked repository into a local directory
