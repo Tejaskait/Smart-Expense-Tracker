@@ -6,3 +6,7 @@ how to contribute:-
 1) go to your repository and fork the repository
 
 2) when you see the forked repository in your own profile clone that forked repository into a local directory
+
+3) commit you changes 
+
+4) push to your forked repo origin
