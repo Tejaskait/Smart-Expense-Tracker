@@ -1,0 +1,9 @@
+Django==5.2.6
+mysqlclient
+Pillow
+pytesseract
+opencv-python
+django-tailwind
+django-browser-reload
+requests
+python-dotenv
