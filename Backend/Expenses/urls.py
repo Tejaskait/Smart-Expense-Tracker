@@ -1,12 +1,14 @@
-# expenses/urls.py
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import ExpenseViewSet, UploadExpenseImage
-
-router = DefaultRouter()
-router.register(r'expenses', ExpenseViewSet, basename='expense')
+# Expenses/urls.py
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('api/', include(router.urls)),
-    path('api/upload/', UploadExpenseImage.as_view(), name='upload-expense-image'),
+    path("", views.expenses_list, name="expenses_list"),
+    path("upload/", views.upload_expense_image, name="upload_expense"),
 ]
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
