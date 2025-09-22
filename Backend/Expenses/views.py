@@ -1,41 +1,30 @@
-# expenses/views.py
-from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.shortcuts import render, redirect
 from .models import Expenses
-from .serializers import ExpenseSerializer, ExpenseImageSerializer
-from PIL import Image
-import pytesseract
-import re
-from datetime import datetime
+from datetime import datetime , date
 
-class ExpenseViewSet(viewsets.ModelViewSet):
-    queryset = Expenses.objects.all()
-    serializer_class = ExpenseSerializer
+def expenses_list(request):
+    expenses = Expenses.objects.all().order_by('-date')
+    return render(request, "expenses_list.html", {"expenses": expenses})
 
-class UploadExpenseImage(APIView):
-    def post(self, request, format=None):
-        serializer = ExpenseImageSerializer(data=request.data)
-        if serializer.is_valid():
-            image = serializer.validated_data['image']
-            text = pytesseract.image_to_string(Image.open(image))
+def upload_expense_image(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        amount = request.POST.get("amount")
+        category = request.POST.get("category", "")
+        expense_date = request.POST.get("date")
 
-            # Extract Amount
-            amount_match = re.search(r'₹?\s?(\d+[.,]?\d*)', text)
-            amount = float(amount_match.group(1).replace(',', '')) if amount_match else 0
+        if expense_date:
+            expense_date = datetime.strptime(expense_date, "%Y-%m-%d").date()
+        else:
+            expense_date = date.today()
 
-            # Extract Date
-            date_match = re.search(r'(\d{2}[/-]\d{2}[/-]\d{2,4})', text)
-            date = datetime.strptime(date_match.group(1), '%d/%m/%Y').date() if date_match else None
+        Expenses.objects.create(
+            title=title,
+            amount=amount,
+            category=category,
+            date=expense_date
+        )
 
-            # Extract Receiver (simple heuristic)
-            receiver_match = re.search(r'To:\s*(.+)', text)
-            receiver = receiver_match.group(1).strip() if receiver_match else "Unknown"
+        return redirect("expenses_list")
 
-            expense = Expenses.objects.create(
-                title=receiver,
-                amount=amount,
-                date=date
-            )
-            return Response(ExpenseSerializer(expense).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return render(request, "upload_expense.html")

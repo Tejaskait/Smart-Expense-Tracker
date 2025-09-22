@@ -16,6 +16,7 @@ DESC expenses_expenses;
 SELECT * FROM expenses_expenses;
 
 delete from expenses_expenses;
+TRUNCATE TABLE expenses_expense;
 
 
 INSERT INTO expenses_expenses (title, amount, category, date)
