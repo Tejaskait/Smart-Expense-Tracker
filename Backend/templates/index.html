@@ -8,50 +8,59 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Header / Navbar -->
   <header class="main-nav">
     <div class="logo">
       <img src="Sources/LogoSET.png" alt="Logo" width="50px">
       <h1>Smart Expense Tracker</h1>
     </div>
     <nav>
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Dashboard</a></li>
-        <li><a href="#">Help</a></li>
-        <li class="profile">
-          <img src="Sources/profile-logo.png " alt="Profile">
-          <a href="#">Profile</a>
-        </li>
-      </ul>
-    </nav>
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#">Help</a></li>
+    <li class="profile">
+      <img src="Sources/profile-logo.png" alt="Profile">
+      <a href="#">Profile</a>
+    </li>
+  </ul>
+  <div class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</nav>
   </header>
+
+  <!-- Hero Section -->
   <div class="container">
     <div class="text-head">
-        <h2>Now Manage Your Expenses</h2>
-        <h1>Smartly !</h1>
+      <h2>Now Manage Your Expenses</h2>
+      <h1>Smartly !</h1>
     </div>
-    <div class="btn-gs" id="get-started"><a href="#func-upload"> Get Started</href></div>
+    <div class="btn-gs" id="get-started"><a href="#func-upload">Get Started</a></div>
   </div>
+
+  <!-- Upload Section -->
   <div class="func-upload" id="func-upload">
     <div class="container-upload">
-        <img src="Sources/folder.png" alt="">
-        <div class="btn-upload" id="btn-upload"><button>UPLOAD IMAGE</button></div>
-        <h2>Upload Image/Screenshot to Automatically add expense.</h2>
-        <h3>Time : 00:00 hrs | Date : dd/mm/yyyy  </h3>
-        <div class="btn-dashboard"><button>View Reports Dashboard</button></div>
+      <img src="Sources/folder.png" alt="">
+      <div class="btn-upload" id="btn-upload"><button>UPLOAD IMAGE</button></div>
+      <h2>Upload Image/Screenshot to Automatically add expense.</h2>
+      <h3>Time : 00:00 hrs | Date : dd/mm/yyyy </h3>
+      <div class="btn-dashboard"><button>View Reports Dashboard</button></div>
     </div>
   </div>
-    <!-- Footer -->
+
+  <!-- Footer -->
   <footer class="footer">
     <div class="footer-container">
-      
       <!-- Logo & Name -->
       <div class="footer-logo">
         <img src="Sources/LogoSET.png" alt="Logo" width="50px">
         <h2>Smart Expense Tracker</h2>
         <p>&copy; 2025 All Rights Reserved</p>
       </div>
-
       <!-- Quick Links -->
       <div class="footer-links">
         <h3>Quick Links</h3>
@@ -62,7 +71,6 @@
           <li><a href="#">Profile</a></li>
         </ul>
       </div>
-
       <!-- Company Info -->
       <div class="footer-info">
         <h3>About Us</h3>
