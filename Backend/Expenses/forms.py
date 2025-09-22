@@ -1,4 +1,7 @@
 from django import forms
+from .models import Expenses
 
-class UploadForm(forms.Form):
-    image = forms.ImageField()
+class ExpenseImageUploadForm(forms.ModelForm):
+    class Meta:
+        model = Expenses
+        fields = ['image']  # the field the user will upload
