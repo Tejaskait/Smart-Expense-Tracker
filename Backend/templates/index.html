@@ -1,16 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Expense Tracker</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Expense Tracker</title>
+  <link rel="icon" href="Sources/LogoSET.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="main-nav">
-        <nav>
-            
-        </nav>
+  <header class="main-nav">
+    <div class="logo">
+      <img src="Sources/LogoSET.png" alt="Logo" width="50px">
+      <h1>Smart Expense Tracker</h1>
     </div>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Help</a></li>
+        <li class="profile">
+          <img src="Sources/profile-logo.png " alt="Profile">
+          <a href="#">Profile</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="text-head">
+        <h2>Now Manage Your Expenses</h2>
+        <h1>Smartly !</h1>
+    </div>
+    <div class="btn-gs" id="get-started"><a href="#func-upload"> Get Started</href></div>
+  </div>
+  <div class="func-upload" id="func-upload">
+    <div class="container-upload">
+        <img src="Sources/folder.png" alt="">
+        <div class="btn-upload" id="btn-upload"><button>UPLOAD IMAGE</button></div>
+        <h2>Upload Image/Screenshot to Automatically add expense.</h2>
+        <h3>Time : 00:00 hrs | Date : dd/mm/yyyy  </h3>
+        <div class="btn-dashboard"><button>View Reports Dashboard</button></div>
+    </div>
+  </div>
+    <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      
+      <!-- Logo & Name -->
+      <div class="footer-logo">
+        <img src="Sources/LogoSET.png" alt="Logo" width="50px">
+        <h2>Smart Expense Tracker</h2>
+        <p>&copy; 2025 All Rights Reserved</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-links">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="#">Help</a></li>
+          <li><a href="#">Profile</a></li>
+        </ul>
+      </div>
+
+      <!-- Company Info -->
+      <div class="footer-info">
+        <h3>About Us</h3>
+        <p>Smart Expense Tracker helps you manage your expenses efficiently and smartly with modern features like auto-upload and detailed dashboards.</p>
+        <p>Email: support@smarttracker.com</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="Scripts.js"></script>
 </body>
 </html>
