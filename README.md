@@ -11,8 +11,6 @@ Includes **weekly & monthly dashboards**, secure authentication, and a modular d
 - 💾 User-specific expense database  
 - 📊 Weekly & monthly dashboards with charts and summaries  
 - 🔐 User authentication & authorization  
-- ⚡ Extensible architecture (add new OCR providers, dashboards, or export formats)  
-
 ---
 
 ## 🛠 Tech Stack
@@ -30,18 +28,19 @@ Install dependencies: pip install -r requirements.txt
 Run migrations: python manage.py migrate
 Start the development server: python manage.py runserver
 
-## Usage
+## 📊 Usage
 
 Create a user account and log in
 Upload a screenshot of your expense receipt
 The OCR feature will extract text from the image and add it to your expense database
 View your monthly and weekly dashboards to track your expenses
 
-## Code Structure
+## 💾 Code Structure
 
 expense_tracker: Django app containing models, views, and templates for expense tracking
 ocr: Module containing OCR functionality for text extraction
 dashboards: Module containing logic for generating monthly and weekly dashboards
-**We will update code structure accordingly to future needs**
+
+**Note : We will update code structure accordingly to future needs**
 
 
