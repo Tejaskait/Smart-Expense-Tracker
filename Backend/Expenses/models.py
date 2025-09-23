@@ -1,4 +1,4 @@
-from django.db import models
+reafrom django.db import models
 
 class Expenses(models.Model):
     amount = models.FloatField()
