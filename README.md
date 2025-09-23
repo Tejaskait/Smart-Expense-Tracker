@@ -18,9 +18,8 @@ Includes **weekly & monthly dashboards**, secure authentication, and a modular d
 ## 🛠 Tech Stack
 - **Backend:** Django (Python web framework)  
 - **OCR:** Tesseract-OCR (default, pluggable adapters supported)  
-- **Database:** PostgreSQL / MySQL / SQLite  
-- **Optional:** Celery + Redis (for async OCR jobs)  
-- **API:** Django REST Framework  
+- **Database:** Mostly db.sqlite3 
+- **API:** Django REST Framework
 
 ---
 
