@@ -35,12 +35,5 @@ expense_tracker: Django app containing models, views, and templates for expense 
 ocr: Module containing OCR functionality for text extraction
 dashboards: Module containing logic for generating monthly and weekly dashboards
 
-Contributing
 
-Contributions are welcome! Please submit a pull request with your changes and a brief description of what you've added.
 
-License
-
-This project is licensed under the MIT License. See LICENSE for details.
-
-You can customize this README file to fit your project's specific needs and style. Make sure to include any additional information that might be helpful for users or contributors.
