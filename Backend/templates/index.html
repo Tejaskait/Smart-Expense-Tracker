@@ -1,85 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Expense Tracker</title>
-  <link rel="icon" href="Sources/LogoSET.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <!-- Header / Navbar -->
-  <header class="main-nav">
-    <div class="logo">
-      <img src="Sources/LogoSET.png" alt="Logo" width="50px">
-      <h1>Smart Expense Tracker</h1>
-    </div>
-    <nav>
-  <ul class="nav-links">
-    <li><a href="#">Home</a></li>
-    <li><a href="#">Dashboard</a></li>
-    <li><a href="#">Help</a></li>
-    <li class="profile">
-      <img src="Sources/profile-logo.png" alt="Profile">
-      <a href="#">Profile</a>
-    </li>
-  </ul>
-  <div class="hamburger">
-    <span></span>
-    <span></span>
-    <span></span>
+
+<body class="min-h-screen font-sans text-white relative">
+  <div class="animated-gradient" aria-hidden="true"></div>
+  <div class="blob blob--one" aria-hidden="true"></div>
+  <div class="blob blob--two" aria-hidden="true"></div>
+  <div class="curved-lines">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path d="M0,160 C480,260 960,60 1440,160" />
+      <path d="M0,220 C480,320 960,120 1440,220" />
+      <path d="M0,100 C480,200 960,0 1440,100" />
+    </svg>
   </div>
-</nav>
+<!-- Code for Navbar, Quick Links will be added -->
+  <header class="w-full py-6 px-6 md:px-12 flex items-center justify-between navbar-gradient">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-xl font-bold"><img src="Sources/LogoSET.png" alt=""></div>
+      <div>
+        <h1 class="text-lg font-semibold tracking-tight">Smart Expense Tracker</h1>
+      </div>
+    </div>
+    <nav class="hidden md:flex gap-10 items-center">
+      <a class="nav-link text-sm opacity-90 hover:opacity-100  text-xl" href="#features">Home</a>
+      <a class="nav-link text-sm opacity-90 hover:opacity-100 text-xl" href="#pricing">Dashboard</a>
+      <a class="nav-link text-sm opacity-90 hover:opacity-100 text-xl" href="#about">Help</a>
+      <button class="ml-2 px-4 py-2 rounded-lg glass-card text-sm font-medium justify-center items-center gap-3 flex"><img src="Sources/profile-logo.png" width="30px" alt=""> Profile</button>
+    </nav>
+    <div class="md:hidden">
+      <button class="p-2 rounded-lg glass-card">☰</button>
+    </div>
   </header>
-
-  <!-- Hero Section -->
-  <div class="container">
-    <div class="text-head">
-      <h2>Now Manage Your Expenses</h2>
-      <h1>Smartly !</h1>
-    </div>
-    <div class="btn-gs" id="get-started"><a href="#func-upload">Get Started</a></div>
-  </div>
-
-  <!-- Upload Section -->
-  <div class="func-upload" id="func-upload">
-    <div class="container-upload">
-      <img src="Sources/folder.png" alt="">
-      <div class="btn-upload" id="btn-upload"><button>UPLOAD IMAGE</button></div>
-      <h2>Upload Image/Screenshot to Automatically add expense.</h2>
-      <h3>Time : 00:00 hrs | Date : dd/mm/yyyy </h3>
-      <div class="btn-dashboard"><button>View Reports Dashboard</button></div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-container">
-      <!-- Logo & Name -->
-      <div class="footer-logo">
-        <img src="Sources/LogoSET.png" alt="Logo" width="50px">
-        <h2>Smart Expense Tracker</h2>
-        <p>&copy; 2025 All Rights Reserved</p>
+<!-- Main section on landing page designed by Tejas -->
+  <main class="px-6 md:px-12 mt-6">
+    <section class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h2 class="text-4xl md:text-5xl font-extrabold leading-tight">Now Manage your expenses smartly !</h2>
+        <p class="mt-4 text-lg opacity-90 max-w-xl">Simply let Smart Expense Tracker automatically add it to your expenses list.</p>
+        <div class="mt-6 flex gap-3">
+          <a href="#" class="px-6 py-3 rounded-lg font-semibold glass-card shadow-lg">Get Started</a>
+          <!-- Add manual expense feature -->
+          <a href="#" class="px-6 py-3 rounded-lg font-medium border border-white/10 opacity-90">Add Expense Manually</a>
+        </div>
+        <!-- Have to Add current date time here -->
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="px-3 py-1 rounded-full glass-card text-sm">Time : 00:00 hrs</span>
+          <span class="px-3 py-1 rounded-full glass-card text-sm">Day : Sunday</span>
+          <span class="px-3 py-1 rounded-full glass-card text-sm">Date : 01/01/2000</span>
+        </div>
       </div>
-      <!-- Quick Links -->
-      <div class="footer-links">
-        <h3>Quick Links</h3>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Dashboard</a></li>
-          <li><a href="#">Help</a></li>
-          <li><a href="#">Profile</a></li>
-        </ul>
+      <div class="p-6 glass-card rounded-2xl shadow-xl m-2 p-3 mt-4">
+        <div class="w-full h-44 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
+          <div class="text-center w-50 flex flex-col justify-center items-center border-white rounded-2xl bg-white bg-opacity-20 p-3 m-2 gap-1">
+            <img src="Sources/upload.png" alt="" width="100px">
+            <button class="bg-black rounded-xl p-1 opacity-80" ><h2 class="font-bold text-xl ">Upload Image</h2></button>
+          </div>
+        </div>
+        <!-- Upload Screenshot feature -->
+        <div class="mt-6 flex flex-col grid-cols-2 gap-4">
+          <div class="p-3 glass-card rounded-lg">
+            <p class="text-sm font-medium">Upload your Image / Screenshot of payment here </p>
+          </div>
+          <div class="p-3 glass-card rounded-lg">
+            <p class="text-sm font-medium">Or Add Expense Manually</p>
+          </div>
+        </div>
+        <!-- Add manual expense feature -->
+        <button class="w-full">
+        <div class="mt-6">
+          
+          <div class="h-20 text-2xl rounded-lg flex items-center justify-center border border-white/6">Add Expense Manually</div>
+        
+        </div></button>
       </div>
-      <!-- Company Info -->
-      <div class="footer-info">
-        <h3>About Us</h3>
-        <p>Smart Expense Tracker helps you manage your expenses efficiently and smartly with modern features like auto-upload and detailed dashboards.</p>
-        <p>Email: support@smarttracker.com</p>
+    </section>
+  </main>
+  <!-- Footer  -->
+  <footer class="mt-16 py-10 px-6 md:px-12 glass-card">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-lg glass-card flex items-center justify-center font-bold"><img src="Sources/LogoSET.png" alt=""></div>
+        <div>
+          <p class="font-semibold">Smart Expense Tracker</p>
+          <p class="text-sm opacity-80">© <script>document.write(new Date().getFullYear())</script> All rights reserved</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-center">
+        <a class="text-sm opacity-90" href="#">Privacy</a>
+        <a class="text-sm opacity-90" href="#">Terms</a>
+        <a class="text-sm opacity-90" href="#">Contact</a>
       </div>
     </div>
   </footer>
-
-  <script src="Scripts.js"></script>
 </body>
 </html>
