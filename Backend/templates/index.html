@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Expense Tracker</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body class="min-h-screen font-sans text-white relative">
@@ -22,7 +23,7 @@
 <!-- Code for Navbar, Quick Links will be added -->
   <header class="w-full py-6 px-6 md:px-12 flex items-center justify-between navbar-gradient">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-xl font-bold"><img src="Sources/LogoSET.png" alt=""></div>
+      <div class="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-xl font-bold"><img src="{% static 'Sources/LogoSET.png' %}" alt=""></div>
       <div>
         <h1 class="text-lg font-semibold tracking-tight">Smart Expense Tracker</h1>
       </div>
@@ -31,7 +32,7 @@
       <a class="nav-link text-sm opacity-90 hover:opacity-100  text-xl" href="#features">Home</a>
       <a class="nav-link text-sm opacity-90 hover:opacity-100 text-xl" href="#pricing">Dashboard</a>
       <a class="nav-link text-sm opacity-90 hover:opacity-100 text-xl" href="#about">Help</a>
-      <button class="ml-2 px-4 py-2 rounded-lg glass-card text-sm font-medium justify-center items-center gap-3 flex"><img src="Sources/profile-logo.png" width="30px" alt=""> Profile</button>
+      <button class="ml-2 px-4 py-2 rounded-lg glass-card text-sm font-medium justify-center items-center gap-3 flex"><img src="{% static 'Sources/profile-logo.png' %}" width="30px" alt=""> Profile</button>
     </nav>
     <div class="md:hidden">
       <button class="p-2 rounded-lg glass-card">☰</button>
@@ -58,7 +59,7 @@
       <div class="p-6 glass-card rounded-2xl shadow-xl m-2 p-3 mt-4">
         <div class="w-full h-44 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
           <div class="text-center w-50 flex flex-col justify-center items-center border-white rounded-2xl bg-white bg-opacity-20 p-3 m-2 gap-1">
-            <img src="Sources/upload.png" alt="" width="100px">
+            <img src="{% static 'Sources/upload.png' %}" alt="" width="100px">
             <button class="bg-black rounded-xl p-1 opacity-80" ><h2 class="font-bold text-xl ">Upload Image</h2></button>
           </div>
         </div>
@@ -85,7 +86,7 @@
   <footer class="mt-16 py-10 px-6 md:px-12 glass-card">
     <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-lg glass-card flex items-center justify-center font-bold"><img src="Sources/LogoSET.png" alt=""></div>
+        <div class="w-12 h-12 rounded-lg glass-card flex items-center justify-center font-bold"><img src="{% static 'Sources/LogoSET.png' %}" alt=""></div>
         <div>
           <p class="font-semibold">Smart Expense Tracker</p>
           <p class="text-sm opacity-80">© <script>document.write(new Date().getFullYear())</script> All rights reserved</p>
