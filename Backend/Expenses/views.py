@@ -4,13 +4,27 @@ from .models import Expenses
 from PIL import Image
 import pytesseract
 from datetime import datetime
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 def home(request):
     return render(request, "index.html") 
 
-
+def signup(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # log in the user immediately after signup
+            auth_login(request, user)
+            return redirect("home")
+    else:
+        form = UserCreationForm()
+    return render(request, "registration/signup.html", {"form": form})
 
 def upload_expense_image(request):
     if request.method == "POST":
