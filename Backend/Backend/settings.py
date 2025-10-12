@@ -125,7 +125,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
+LOGIN_URL = 'login'               # named URL for login (provided by auth urls)
+LOGIN_REDIRECT_URL = 'home'       # where to go after login (change if needed)
+LOGOUT_REDIRECT_URL = 'home'      # where to go after logout
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
