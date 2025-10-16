@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Smart Expense Tracker{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto  mb-16 px-6">
+  
+  <!-- Dashboard Header -->
+  <div class="text-center mb-10">
+    <h2 class="text-4xl font-bold mb-2">Your Dashboard</h2>
+    <p class="text-gray-200">A summary of your recent spending and budget overview.</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
+      <h3 class="text-xl font-semibold mb-2">Total Expenses</h3>
+      <p class="text-3xl font-bold text-yellow-300">₹12,450</p>
+      <p class="text-sm text-gray-300 mt-2">This month</p>
+    </div>
+
+    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
+      <h3 class="text-xl font-semibold mb-2">Monthly Budget</h3>
+      <p class="text-3xl font-bold text-green-300">₹25,000</p>
+      <p class="text-sm text-gray-300 mt-2">Target Budget</p>
+    </div>
+
+    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
+      <h3 class="text-xl font-semibold mb-2">Remaining Balance</h3>
+      <p class="text-3xl font-bold text-red-300">₹12,550</p>
+      <p class="text-sm text-gray-300 mt-2">You’re doing great!</p>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="glass-card rounded-2xl shadow-lg p-6 mb-10">
+    <h3 class="text-2xl font-semibold mb-4">Expenses Overview</h3>
+    <canvas id="expensesChart" height="120"></canvas>
+  </div>
+
+  <!-- Recent Transactions Table -->
+  <div class="glass-card rounded-2xl shadow-lg p-6 overflow-x-auto">
+    <h3 class="text-2xl font-semibold mb-4">Recent Transactions</h3>
+    <table class="w-full text-left border-collapse text-white">
+      <thead>
+        <tr class="border-b border-white/20">
+          <th class="py-2 px-3">Date</th>
+          <th class="py-2 px-3">Category</th>
+          <th class="py-2 px-3">Description</th>
+          <th class="py-2 px-3">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-white/10 hover:bg-white/5 transition">
+          <td class="py-2 px-3">2025-10-12</td>
+          <td class="py-2 px-3">Food</td>
+          <td class="py-2 px-3">Zomato Order</td>
+          <td class="py-2 px-3 text-yellow-300">₹450</td>
+        </tr>
+        <tr class="border-b border-white/10 hover:bg-white/5 transition">
+          <td class="py-2 px-3">2025-10-14</td>
+          <td class="py-2 px-3">Travel</td>
+          <td class="py-2 px-3">Uber Ride</td>
+          <td class="py-2 px-3 text-yellow-300">₹1,200</td>
+        </tr>
+        <tr class="hover:bg-white/5 transition">
+          <td class="py-2 px-3">2025-10-15</td>
+          <td class="py-2 px-3">Shopping</td>
+          <td class="py-2 px-3">Amazon Purchase</td>
+          <td class="py-2 px-3 text-yellow-300">₹2,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Chart.js Script -->
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const ctx = document.getElementById('expensesChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Expenses (₹)',
+        data: [8000, 12500, 10000, 14500, 12000, 9500],
+        borderColor: 'rgba(255,255,255,0.9)',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointBackgroundColor: 'rgba(255,255,255,0.8)',
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          ticks: { color: '#ddd' },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        },
+        y: {
+          ticks: { color: '#ddd' },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        }
+      },
+      plugins: {
+        legend: { labels: { color: '#fff' } }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

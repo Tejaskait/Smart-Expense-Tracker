@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Home - Smart Expense Tracker{% endblock %}
+{% load static %}
+{% block content %}
+<section class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center w-full h-full px-6">
+  <div>
+    <h2 class="text-6xl md:text-5xl font-extrabold leading-tight">Now Manage your expenses smartly!</h2>
+    <p class="mt-4 text-lg opacity-90 max-w-xl">Simply let Smart Expense Tracker automatically add it to your expenses list.</p>
+    <div class="mt-6 flex gap-4">
+      <a href="#upload-section" class="px-6 py-3 rounded-lg font-semibold glass-card shadow-lg border border-white/10 hover:border-white/30">Get Started</a>
+      <a href="{% url 'dashboard' %}" class="px-6 py-3 rounded-lg font-medium border border-white/20 hover:border-white/40">View Dashboard</a>
+    </div>
+    <div class="mt-8 flex flex-wrap gap-3">
+  <span id="time" class="px-3 py-1 rounded-full glass-card text-sm border border-white/10">Time : --:-- hrs</span>
+  <span id="day" class="px-3 py-1 rounded-full glass-card text-sm border border-white/10">Day : --</span>
+  <span id="date" class="px-3 py-1 rounded-full glass-card text-sm border border-white/10">Date : --/--/----</span>
+</div>
+
+  </div>
+
+  <div class="png-home">
+    <img src="{% static 'Sources/png_bg.jpg' %}" alt="" width="100%" class="rounded-2xl shadow-lg">
+  </div>
+</section>
+
+<!-- Upload Section -->
+<div id="upload-section" class="upload-section flex items-center justify-center min-h-screen mt-16">
+  <div class="p-6 glass-card rounded-2xl shadow-2xl w-full md:w-3/5 lg:w-2/5 text-center border border-white/10">
+    <div class="w-full h-44 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
+      <div class="text-center flex flex-col justify-center items-center border-white rounded-2xl bg-white bg-opacity-20 p-4 m-2 gap-2">
+        <img src="{% static 'Sources/upload.png' %}" alt="" width="100px">
+        <button class="bg-black rounded-xl p-2 opacity-80 hover:opacity-100 transition">
+          <h2 class="font-bold text-xl">Upload Image</h2>
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-8 flex flex-col gap-4">
+      <div class="p-3 glass-card rounded-lg border border-white/10">
+        <p class="text-sm font-medium">Upload your Image / Screenshot of payment here</p>
+      </div>
+      <div class="p-3 glass-card rounded-lg border border-white/10">
+        <p class="text-sm font-medium">Or Add Expense Manually</p>
+      </div>
+    </div>
+
+    <!-- New Expense Form Fields -->
+    <div class="mt-6 flex flex-col gap-4 text-left">
+      <label class="text-sm font-medium">Select Date:</label>
+      <input type="date" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" />
+
+      <label class="text-sm font-medium">Category:</label>
+      <input type="text" placeholder="Enter category" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" />
+
+      <label class="text-sm font-medium">Amount:</label>
+      <input type="number" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" />
+    </div>
+
+    <!-- Add Expense Button -->
+    <button class="w-full mt-8">
+      <div class="h-20 text-2xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
+        Add Expense
+      </div>
+    </button>
+  </div>
+</div>
+
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    
+    // Format time
+    let hours = now.getHours().toString().padStart(2, '0');
+    let minutes = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('time').textContent = `Time : ${hours}:${minutes} hrs`;
+
+    // Format day
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    document.getElementById('day').textContent = `Day : ${days[now.getDay()]}`;
+
+    // Format date
+    let day = now.getDate().toString().padStart(2, '0');
+    let month = (now.getMonth() + 1).toString().padStart(2, '0');
+    let year = now.getFullYear();
+    document.getElementById('date').textContent = `Date : ${day}/${month}/${year}`;
+  }
+
+  // Update immediately and every minute
+  updateDateTime();
+  setInterval(updateDateTime, 60000);
+</script>
+
+{% endblock %}

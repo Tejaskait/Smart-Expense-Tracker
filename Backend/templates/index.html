@@ -1,171 +1,67 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Expense Tracker</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <style>
-   /* Navbar white bottom shadow */
-    .navbar-shadow {
-      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-    }
+{% extends 'base.html' %}
+{% block title %}Home | Smart Expense Tracker{% endblock %}
 
-    /* Fullscreen main section */
-    main {
-      min-height: 80vh;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Upload section centered */
-    .upload-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* Smooth scroll */
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* PNG animation */
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
-    }
-    .png-home img {
-      opacity: 0.9;
-      animation: float 5s ease-in-out infinite;
-      transition: transform 0.4s ease, opacity 0.3s ease;
-    }
-    .png-home img:hover {
-      transform: scale(1.03);
-      opacity: 1;
-    }
-
-    /* Button hover effects */
-    button, a {
-      transition: all 0.3s ease;
-    }
-    a:hover, button:hover {
-      transform: scale(1.05);
-      filter: brightness(1.2);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
-    }
-  </style>
-</head>
-
-<body class="min-h-screen font-sans text-white relative">
-  <div class="animated-gradient" aria-hidden="true"></div>
-  <div class="blob blob--one" aria-hidden="true"></div>
-  <div class="blob blob--two" aria-hidden="true"></div>
-  <div class="curved-lines">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path d="M0,160 C480,260 960,60 1440,160" />
-      <path d="M0,220 C480,320 960,120 1440,220" />
-      <path d="M0,100 C480,200 960,0 1440,100" />
-    </svg>
-  </div>
-
-  <!-- Navbar -->
-  <header class="w-full py-6 px-6 md:px-12 flex items-center justify-between navbar-gradient navbar-shadow fixed top-0 left-0 z-50">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-xl font-bold">
-        <img src="{% static 'Sources/LogoSET.png' %}" alt="">
-      </div>
-      <div>
-        <h1 class="text-lg font-semibold tracking-tight">Smart Expense Tracker</h1>
-      </div>
+{% block content %}
+<section class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+  <div>
+    <h2 class="text-5xl md:text-6xl font-extrabold leading-tight">Now Manage your expenses smartly!</h2>
+    <p class="mt-4 text-lg opacity-90 max-w-xl">
+      Simply let Smart Expense Tracker automatically add it to your expenses list.
+    </p>
+    <div class="mt-6 flex gap-4">
+      <a href="#upload-section" class="px-6 py-3 rounded-lg font-semibold glass-card shadow-lg">Get Started</a>
+      <a href="{% url 'upload_expense' %}" class="px-6 py-3 rounded-lg font-medium border border-white/10 opacity-90">Add Expense Manually</a>
     </div>
-    <nav class="hidden md:flex gap-10 items-center">
-      <a class="nav-link text-sm opacity-90 hover:opacity-100 text-xl" href="#features">Home</a>
-      <a class="nav-link text-sm opacity-90 hover:opacity-100 text-xl" href="#pricing">Dashboard</a>
-      <a class="nav-link text-sm opacity-90 hover:opacity-100 text-xl" href="#about">Help</a>
-      <button class="ml-2 px-4 py-2 rounded-lg glass-card text-sm font-medium justify-center items-center gap-3 flex">
-        <img src="{% static 'Sources/profile-logo.png' %}" width="30px" alt=""> Profile
-      </button>
-    </nav>
-    <div class="md:hidden">
-      <button class="p-2 rounded-lg glass-card">☰</button>
-    </div>
-  </header>
-
-  <!-- Main Section -->
-  <main class="px-2 md:pt-12">
-    <section class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center w-full h-full">
-      <div>
-        <h2 class="text-6xl md:text-5xl font-extrabold leading-tight">Now Manage your expenses smartly !</h2>
-        <p class="mt-4 text-lg opacity-90 max-w-xl">Simply let Smart Expense Tracker automatically add it to your expenses list.</p>
-        <div class="mt-6 flex gap-4">
-          <a href="#upload-section" class="px-6 py-3 rounded-lg font-semibold glass-card shadow-lg">Get Started</a>
-          <a href="#" class="px-6 py-3 rounded-lg font-medium border border-white/10 opacity-90">Add Expense Manually</a>
-        </div>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <span class="px-3 py-1 rounded-full glass-card text-sm">Time : 00:00 hrs</span>
-          <span class="px-3 py-1 rounded-full glass-card text-sm">Day : Sunday</span>
-          <span class="px-3 py-1 rounded-full glass-card text-sm">Date : 01/01/2000</span>
-        </div>
-      </div>
-      <div class="png-home">
-        <img src="{% static 'Sources/png_bg.jpg' %}" alt="" width="100%" class="rounded-2xl shadow-lg">
-      </div>
-    </section>
-  </main>
-
-  <!-- Upload Image Section -->
-  <div id="upload-section" class="upload-section mt-4 mb-16">
-    <div class="p-6 glass-card rounded-2xl shadow-2xl w-full md:w-3/5 lg:w-2/5 text-center">
-      <div class="w-full h-44 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
-        <div class="text-center flex flex-col justify-center items-center border-white rounded-2xl bg-white bg-opacity-20 p-4 m-2 gap-2">
-          <img src="{% static 'Sources/upload.png' %}" alt="" width="100px">
-          <button class="bg-black rounded-xl p-2 opacity-80">
-            <h2 class="font-bold text-xl">Upload Image</h2>
-          </button>
-        </div>
-      </div>
-
-      <div class="mt-8 flex flex-col gap-4">
-        <div class="p-3 glass-card rounded-lg">
-          <p class="text-sm font-medium">Upload your Image / Screenshot of payment here</p>
-        </div>
-        <div class="p-3 glass-card rounded-lg">
-          <p class="text-sm font-medium">Or Add Expense Manually</p>
-        </div>
-      </div>
-
-      <button class="w-full mt-8">
-        <div class="h-20 text-2xl rounded-lg flex items-center justify-center border border-white/6 hover:bg-white hover:text-black transition duration-300">
-          Add Expense Manually
-        </div>
-      </button>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <span class="px-3 py-1 rounded-full glass-card text-sm">Time : 00:00 hrs</span>
+      <span class="px-3 py-1 rounded-full glass-card text-sm">Day : Sunday</span>
+      <span class="px-3 py-1 rounded-full glass-card text-sm">Date : 01/01/2000</span>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="mt-16 py-10 px-6 md:px-12 glass-card">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-lg glass-card flex items-center justify-center font-bold">
-          <img src="{% static 'Sources/LogoSET.png' %}" alt="">
-        </div>
-        <div>
-          <p class="font-semibold">Smart Expense Tracker</p>
-          <p class="text-sm opacity-80">© <script>document.write(new Date().getFullYear())</script> All rights reserved</p>
-        </div>
-      </div>
-      <div class="flex gap-4 items-center">
-        <a class="text-sm opacity-90" href="#">Privacy</a>
-        <a class="text-sm opacity-90" href="#">Terms</a>
-        <a class="text-sm opacity-90" href="#">Contact</a>
+  <div class="png-home">
+    <img src="{% static 'Sources/png_bg.jpg' %}" alt="" width="100%" class="rounded-2xl shadow-lg">
+  </div>
+</section>
+
+<!-- Upload Section -->
+<div id="upload-section" class="upload-section mt-16 mb-16">
+  <div class="p-6 glass-card rounded-2xl shadow-2xl w-full md:w-3/5 lg:w-2/5 text-center">
+    <div class="w-full h-44 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
+      <div class="text-center flex flex-col justify-center items-center bg-white bg-opacity-20 p-4 m-2 gap-2 rounded-2xl">
+        <img src="{% static 'Sources/upload.png' %}" alt="" width="100px">
+        <button class="bg-black rounded-xl p-2 opacity-80">
+          <h2 class="font-bold text-xl">Upload Image</h2>
+        </button>
       </div>
     </div>
-  </footer>
-</body>
-</html>
+
+    <div class="mt-8 flex flex-col gap-4">
+      <div class="p-3 glass-card rounded-lg">
+        <p class="text-sm font-medium">Upload your Image / Screenshot of payment here</p>
+      </div>
+      <div class="p-3 glass-card rounded-lg">
+        <p class="text-sm font-medium">Or Add Expense Manually</p>
+      </div>
+    </div>
+
+    <!-- Expense Form -->
+    <div class="mt-6 flex flex-col gap-4 text-left">
+      <label class="text-sm font-medium">Select Date:</label>
+      <input type="date" class="w-full p-3 rounded-lg glass-card text-white" />
+
+      <label class="text-sm font-medium">Category:</label>
+      <input type="text" placeholder="Enter category" class="w-full p-3 rounded-lg glass-card text-white" />
+
+      <label class="text-sm font-medium">Amount:</label>
+      <input type="number" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white" />
+    </div>
+
+    <button class="w-full mt-8">
+      <div class="h-20 text-2xl rounded-lg flex items-center justify-center border border-white/6 hover:bg-white hover:text-black transition duration-300">
+        Add Expense
+      </div>
+    </button>
+  </div>
+</div>
+{% endblock %}

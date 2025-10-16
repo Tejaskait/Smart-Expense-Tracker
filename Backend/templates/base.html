@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Smart Expense Tracker{% endblock %}</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    /* Navbar buttons with border and hover */
+    .nav-btn {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 6px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.animated-gradient,
+.blob,
+.curved-lines,
+.curved-lines path {
+    pointer-events: none !important;
+}
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100; /* higher than background blobs */
+}
+
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 150;
+}
+
+
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen font-sans text-white relative">
+  <!-- Animated Background -->
+  <div class="animated-gradient" aria-hidden="true"></div>
+  <div class="blob blob--one" aria-hidden="true"></div>
+  <div class="blob blob--two" aria-hidden="true"></div>
+  <div class="curved-lines">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path d="M0,160 C480,260 960,60 1440,160" />
+      <path d="M0,220 C480,320 960,120 1440,220" />
+      <path d="M0,100 C480,200 960,0 1440,100" />
+    </svg>
+  </div>
+
+  <!-- Navbar -->
+  <header class="w-full py-6 px-6 md:px-12 flex items-center justify-between navbar-gradient navbar-shadow fixed top-0 left-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-xl font-bold">
+        <img src="{% static 'Sources/LogoSET.png' %}" alt="">
+      </div>
+      <h1 class="text-lg font-semibold tracking-tight">Smart Expense Tracker</h1>
+    </div>
+
+    <nav class="hidden md:flex gap-6 items-center">
+      <a href="{% url 'home' %}" class="nav-btn">Home</a>
+      <a href="{% url 'dashboard' %}" class="nav-btn">Dashboard</a>
+      <a href="{% url 'about' %}" class="nav-btn">Help</a>
+      <a href="{% url 'login' %}" class="nav-btn flex items-center gap-2">
+        <img src="{% static 'Sources/profile-logo.png' %}" width="25" alt=""> Profile
+      </a>
+    </nav>
+
+    <div class="md:hidden">
+      <button class="p-2 rounded-lg glass-card">☰</button>
+    </div>
+  </header>
+
+  <!-- Page Body -->
+  <main class="pt-28 md:pt-32">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-16 py-10 px-6 md:px-12 glass-card">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-lg glass-card flex items-center justify-center font-bold">
+          <img src="{% static 'Sources/LogoSET.png' %}" alt="">
+        </div>
+        <div>
+          <p class="font-semibold">Smart Expense Tracker</p>
+          <p class="text-sm opacity-80">© <script>document.write(new Date().getFullYear())</script> All rights reserved</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-center">
+        <a class="text-sm opacity-90" href="{% url 'about' %}">Privacy</a>
+        <a class="text-sm opacity-90" href="{% url 'about' %}">Terms</a>
+        <a class="text-sm opacity-90" href="{% url 'about' %}">Contact</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -12,8 +12,14 @@ from django.contrib.auth.decorators import login_required
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 def home(request):
-    return render(request, "index.html") 
+    return render(request, 'home.html')
 
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+def about(request):
+    return render(request, 'about.html')
+    
 def signup(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
