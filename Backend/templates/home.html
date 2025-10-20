@@ -3,59 +3,78 @@
 {% load static %}
 {% block content %}
 
-<section class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center w-full h-full px-6">
-  <div>
-    <h2 class="text-6xl md:text-5xl font-extrabold leading-tight">Now Manage your expenses smartly!</h2>
-    <p class="mt-4 text-lg opacity-90 max-w-xl">Simply let Smart Expense Tracker automatically add it to your expenses list.</p>
-    <div class="mt-6 flex gap-4">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center w-full h-full px-6 py-12">
+  <div class="flex flex-col gap-6">
+    <h2 class="text-5xl sm:text-6xl font-extrabold leading-tight">Now Manage your expenses smartly!</h2>
+    <p class="text-lg opacity-90 max-w-xl">Simply let Smart Expense Tracker automatically add it to your expenses list.</p>
+    <div class="flex flex-wrap gap-4">
       <a href="#upload-section" class="px-6 py-3 rounded-lg font-semibold glass-card shadow-lg border border-white/10 hover:border-white/30">Get Started</a>
       <a href="{% url 'dashboard' %}" class="px-6 py-3 rounded-lg font-medium border border-white/20 hover:border-white/40">View Dashboard</a>
     </div>
-    <div class="mt-8 flex flex-wrap gap-3">
+    <div class="flex flex-wrap gap-3 mt-4">
       <span id="time" class="px-3 py-1 rounded-full glass-card text-sm border border-white/10">Time : --:-- hrs</span>
       <span id="day" class="px-3 py-1 rounded-full glass-card text-sm border border-white/10">Day : --</span>
       <span id="date" class="px-3 py-1 rounded-full glass-card text-sm border border-white/10">Date : --/--/----</span>
     </div>
   </div>
 
-  <div class="png-home">
-    <img src="{% static 'Sources/png_bg.jpg' %}" alt="" width="100%" class="rounded-2xl shadow-lg">
+  <div class="flex flex-col items-center gap-4">
+    <img src="{% static 'Sources/png_bg.jpg' %}" alt="Hero Image" class="w-full max-w-md rounded-2xl shadow-lg object-cover">
   </div>
 </section>
 
-<!-- Upload Section -->
-<div id="upload-section" class="upload-section flex items-center justify-center min-h-screen mt-16">
-  <div class="p-6 glass-card rounded-2xl shadow-2xl w-full md:w-3/5 lg:w-2/5 text-center border border-white/10">
-    <div class="w-full h-44 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
-      <div class="text-center flex flex-col justify-center items-center border-white rounded-2xl bg-white bg-opacity-20 p-4 m-2 gap-2">
-        <img src="{% static 'Sources/upload.png' %}" alt="" width="100px">
+<!-- Upload / Add Expense Section -->
+<div id="upload-section" class="upload-section flex justify-center px-4 py-12">
+  <div class="w-full md:w-3/5 lg:w-2/5 p-6 glass-card rounded-2xl shadow-2xl text-center border border-white/10">
+    <!-- Image Upload Placeholder -->
+    <div class="w-full h-44 sm:h-48 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
+      <div class="flex flex-col items-center justify-center border-white rounded-2xl bg-white bg-opacity-20 p-4 gap-2">
+        <img src="{% static 'Sources/upload.png' %}" alt="Upload" class="w-24 sm:w-28">
       </div>
     </div>
 
+    <!-- Upload & Manual Add Buttons -->
+    <div class="mt-4 flex flex-col gap-2 items-center">
+      <button id="uploadImageBtn" class="h-14 px-4 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300 ">
+        Upload Payment Screenshot
+      </button>
+
+      <p class="text-white/70 text-center text-sm sm:text-base">Or Add Expense Manually</p>
+    </div>
+
     <!-- Expense Form -->
-    <form id="expenseForm" method="POST" action="{% url 'add_expense' %}" class="mt-6 flex flex-col gap-4 text-left">
+    <form id="expenseForm" method="POST" action="{% url 'add_expense' %}" class="mt-6 flex flex-col gap-4 text-left relative">
       {% csrf_token %}
       <label class="text-sm font-medium">Select Date:</label>
       <input type="date" name="date" id="expense-date" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required/>
 
       <label class="text-sm font-medium">Category:</label>
-      <select name="category" id="category" class="animated-select w-full p-3 rounded-lg glass-card text-white border border-white/10 bg-transparent focus:ring-2 focus:ring-white/30 transition-all duration-300" required>
+      <select name="category" id="category" class="w-full p-3 rounded-lg glass-card text-white border border-white/10 bg-grey focus:ring-2 focus:ring-white/30 transition-all duration-300" required>
         <option value="" disabled selected>Select category</option>
-        <option value="Food">🍽️ Food</option>
-        <option value="Travel">🚗 Travel</option>
-        <option value="Shopping">🛍️ Shopping</option>
-        <option value="Personal">💼 Personal</option>
+        <option value="Food " class="text-black">🍽️ Food</option>
+        <option value="Travel" class="text-black">🚗 Travel</option>
+        <option value="Shopping" class="text-black">🛍️ Shopping</option>
+        <option value="Personal" class="text-black">💼 Personal</option>
       </select>
 
       <label class="text-sm font-medium">Amount:</label>
       <input type="number" name="amount" id="amount" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required />
 
       <label class="text-sm font-medium">Description:</label>
-      <input type="text" name="description" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10"/>
+      <input type="text" name="description" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10"required />
 
-      <button type="submit" class="w-full mt-6">
-        <div class="h-14 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
+      <button type="submit" class="w-full mt-6 relative">
+        <div id="addExpenseBtn" class="h-14 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
           Add Expense
+        </div>
+
+        <!-- Floating Success Modal -->
+        <div id="floatingModal" class="absolute left-1/2 -translate-x-1/2 -top-20 opacity-0 transition-all duration-500 transform -translate-y-2 text-center p-3 rounded-lg bg-green-600 text-white font-semibold shadow-lg w-max sm:w-auto">
+          ✅ Expense Added Successfully!
+          <button id="viewDashboardBtn" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium text-sm">
+            View Dashboard
+          </button>
         </div>
       </button>
     </form>
@@ -63,25 +82,68 @@
 </div>
 
 <script>
-  // Date + Time display
+document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("expense-date").value = today;
+
+  // Update time, day, date
+  const timeSpan = document.getElementById("time");
+  const daySpan = document.getElementById("day");
+  const dateSpan = document.getElementById("date");
+
   function updateDateTime() {
     const now = new Date();
-    let hours = now.getHours().toString().padStart(2, '0');
-    let minutes = now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('time').textContent = `Time : ${hours}:${minutes} hrs`;
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    document.getElementById('day').textContent = `Day : ${days[now.getDay()]}`;
-    let day = now.getDate().toString().padStart(2, '0');
-    let month = (now.getMonth() + 1).toString().padStart(2, '0');
-    let year = now.getFullYear();
-    document.getElementById('date').textContent = `Date : ${day}/${month}/${year}`;
+    const hours = now.getHours().toString().padStart(2,'0');
+    const minutes = now.getMinutes().toString().padStart(2,'0');
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const day = days[now.getDay()];
+    const date = now.toLocaleDateString();
+
+    timeSpan.textContent = `Time : ${hours}:${minutes} hrs`;
+    daySpan.textContent = `Day : ${day}`;
+    dateSpan.textContent = `Date : ${date}`;
   }
+
   updateDateTime();
   setInterval(updateDateTime, 60000);
-  document.addEventListener("DOMContentLoaded", () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById("expense-date").value = today;
+
+  // Form submit handler
+  const form = document.getElementById("expenseForm");
+  const floatingModal = document.getElementById("floatingModal");
+  const viewDashboardBtn = document.getElementById("viewDashboardBtn");
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+    }).then(res => {
+      if(res.ok) {
+        // Show floating modal with slide-up
+        floatingModal.style.opacity = "1";
+        floatingModal.style.transform = "translate(-50%, -12px)";
+
+        // Reset form
+        form.reset();
+        document.getElementById("expense-date").value = today;
+
+        // Hide modal after 3s
+        setTimeout(() => {
+          floatingModal.style.opacity = "0";
+          floatingModal.style.transform = "translate(-50%, -2px)";
+        }, 3000);
+      } else {
+        alert("Error adding expense");
+      }
+    }).catch(err => alert("Error: "+err));
   });
+
+  // Dashboard button click
+  viewDashboardBtn.addEventListener("click", () => {
+    window.location.href = "{% url 'dashboard' %}";
+  });
+});
 </script>
 
 {% endblock %}

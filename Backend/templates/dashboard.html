@@ -8,9 +8,15 @@
 
   <!-- 💰 Budget & Summary Section -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 class="text-xl font-semibold mb-2">Total Expenses</h2>
-      <p class="text-3xl font-bold text-red-400">₹{{ total_expenses }}</p>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-md flex flex-col justify-between">
+      <div>
+        <h2 class="text-xl font-semibold mb-2">Total Expenses</h2>
+        <p class="text-3xl font-bold text-red-400">₹{{ total_expenses }}</p>
+      </div>
+      <a href="{% url 'home' %}#add-expense" 
+         class="mt-4 inline-block bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-semibold text-center">
+        Add Expense
+      </a>
     </div>
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
       <h2 class="text-xl font-semibold mb-2">Remaining Balance</h2>
@@ -37,13 +43,13 @@
   </div>
 
   <!-- 📈 Charts Section -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+  <div class="grid w-5/6 grid-cols-1 md:grid-cols-2 gap-14 mb-10 flex justify-center">
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold mb-4">Monthly Expense Chart</h2>
+      <h2 class="text-lg font-semibold mb-4">Monthly Expense Chart for this year -</h2>
       <canvas id="monthChart"></canvas>
     </div>
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold mb-4">Category-wise Expense</h2>
+      <h2 class="text-lg font-semibold mb-4">Category-wise Expense for this month -</h2>
       <canvas id="categoryChart"></canvas>
     </div>
   </div>
@@ -75,7 +81,7 @@
         <tr>
           <th class="p-3">Date</th>
           <th class="p-3">Category</th>
-          <th class="p-3">Merchant</th>
+          <th class="p-3">Description</th>
           <th class="p-3">Amount (₹)</th>
           <th class="p-3 text-center">Action</th>
         </tr>
@@ -108,7 +114,10 @@
 
 <!-- 📊 Charts Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
 <script>
+  // --- Monthly Expense Bar Chart ---
   const monthCtx = document.getElementById('monthChart').getContext('2d');
   new Chart(monthCtx, {
     type: 'bar',
@@ -121,21 +130,60 @@
       }]
     },
     options: {
-      scales: { y: { beginAtZero: true } }
+      scales: { y: { beginAtZero: true } },
+      plugins: {
+        legend: { display: false }
+      }
     }
   });
 
+  // --- Category Pie Chart ---
   const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+  const categoryLabels = {{ category_labels|safe }};
+  const categoryValues = {{ category_values|safe }};
+
+  // Fixed unique colors
+  const categoryColors = [
+      '#3b82f6', '#22c55e', '#ef4444', '#eab308', 
+      '#8b5cf6', '#06b6d4', '#f97316', '#f43f5e',
+      '#a3e635', '#6366f1'
+  ];
+  while(categoryColors.length < categoryLabels.length){
+      categoryColors.push('#' + Math.floor(Math.random()*16777215).toString(16));
+  }
+
   new Chart(categoryCtx, {
-    type: 'doughnut',
-    data: {
-      labels: [{% for e in expenses %}'{{ e.category }}',{% endfor %}],
-      datasets: [{
-        data: [{% for e in expenses %}{{ e.amount }},{% endfor %}],
-        backgroundColor: ['#3b82f6', '#22c55e', '#ef4444', '#eab308', '#8b5cf6', '#06b6d4'],
-      }]
-    },
+      type: 'pie',
+      data: {
+          labels: categoryLabels,
+          datasets: [{
+              data: categoryValues,
+              backgroundColor: categoryColors.slice(0, categoryLabels.length)
+          }]
+      },
+      options: {
+          responsive: true,
+          plugins: {
+              legend: {
+                  position: 'right',
+                  labels: { color: 'white' }
+              },
+              tooltip: {
+                  callbacks: {
+                      label: function(context){
+                          return `${context.label}: ₹${context.parsed}`;
+                      }
+                  }
+              },
+              datalabels: {
+                  color: 'white',
+                  formatter: (value, ctx) => `₹${value}`
+              }
+          }
+      },
+      plugins: [ChartDataLabels]
   });
+
 </script>
 
 <!-- ⚙️ AJAX Script -->

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum
 from datetime import datetime
 import calendar
+from collections import defaultdict
 from .models import Expenses
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
@@ -61,6 +62,14 @@ def dashboard(request):
         total = Expenses.objects.filter(date__month=m).aggregate(Sum('amount'))['amount__sum'] or 0
         month_values.append(total)
 
+    # Aggregate expenses per category for pie chart
+    category_data = defaultdict(float)
+    for e in expenses:
+        category_data[e.category] += e.amount
+
+    category_labels = list(category_data.keys())
+    category_values = list(category_data.values())
+
     context = {
         "expenses": expenses,
         "total_expenses": total_expenses,
@@ -69,6 +78,8 @@ def dashboard(request):
         "month_names": month_names,
         "month_values": month_values,
         "selected_month": selected_month or "all",
+        "category_labels": category_labels,
+        "category_values": category_values,
     }
     return render(request, "dashboard.html", context)
 
