@@ -2,8 +2,8 @@
 {% block title %}Dashboard - Smart Expense Tracker{% endblock %}
 
 {% block content %}
-<section class="max-w-6xl mx-auto  mb-16 px-6">
-  
+<section class="max-w-6xl mx-auto mb-16 px-6">
+
   <!-- Dashboard Header -->
   <div class="text-center mb-10">
     <h2 class="text-4xl font-bold mb-2">Your Dashboard</h2>
@@ -12,18 +12,35 @@
 
   <!-- Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
-      <h3 class="text-xl font-semibold mb-2">Total Expenses</h3>
-      <p class="text-3xl font-bold text-yellow-300">₹12,450</p>
-      <p class="text-sm text-gray-300 mt-2">This month</p>
+    
+    <!-- Total Expenses Card -->
+    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform flex flex-col justify-between">
+      <div>
+        <h3 class="text-xl font-semibold mb-2">Total Expenses</h3>
+        <p class="text-3xl font-bold text-yellow-300">₹12,450</p>
+        <p id="currentMonth" class="text-sm text-gray-300 mt-2"></p>
+      </div>
+      <a href="{% url 'home' %}" 
+         class="mt-4 inline-block bg-yellow-400 text-black font-semibold py-2 px-4 rounded-xl hover:bg-yellow-500 transition">
+        + Add Expense
+      </a>
     </div>
 
-    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
-      <h3 class="text-xl font-semibold mb-2">Monthly Budget</h3>
-      <p class="text-3xl font-bold text-green-300">₹25,000</p>
-      <p class="text-sm text-gray-300 mt-2">Target Budget</p>
+    <!-- Monthly Budget Card -->
+    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform flex flex-col justify-between">
+      <div>
+        <h3 class="text-xl font-semibold mb-2">Monthly Budget</h3>
+        <p class="text-3xl font-bold text-green-300">₹25,000</p>
+        <p class="text-sm text-gray-300 mt-2">Target Budget</p>
+      </div>
+      <button 
+        class="mt-4 inline-block bg-green-400 text-black font-semibold py-2 px-4 rounded-xl hover:bg-green-500 transition"
+        onclick="openBudgetModal()">
+        ✏️ Set Budget
+      </button>
     </div>
 
+    <!-- Remaining Balance Card -->
     <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
       <h3 class="text-xl font-semibold mb-2">Remaining Balance</h3>
       <p class="text-3xl font-bold text-red-300">₹12,550</p>
@@ -33,7 +50,7 @@
 
   <!-- Chart Section -->
   <div class="glass-card rounded-2xl shadow-lg p-6 mb-10">
-    <h3 class="text-2xl font-semibold mb-4">Expenses Overview</h3>
+    <h3 id="chartTitle" class="text-2xl font-semibold mb-4">Expenses Overview</h3>
     <canvas id="expensesChart" height="120"></canvas>
   </div>
 
@@ -73,6 +90,23 @@
   </div>
 </section>
 
+<!-- Set Budget Modal -->
+<div id="budgetModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl w-96">
+    <h3 class="text-2xl font-semibold mb-4">Set Monthly Budget</h3>
+    <form>
+      <input type="number" placeholder="Enter new budget amount"
+             class="w-full p-3 rounded-lg text-black mb-4 focus:outline-none" required>
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="closeBudgetModal()"
+                class="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">Cancel</button>
+        <button type="submit"
+                class="px-4 py-2 rounded-lg bg-green-400 text-black font-semibold hover:bg-green-500">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Chart.js Script -->
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -80,6 +114,24 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // Get current month and year
+  const now = new Date();
+  const month = now.toLocaleString('default', { month: 'long' });
+  const year = now.getFullYear();
+
+  // Display current month in Total Expenses
+  const currentMonthEl = document.getElementById("currentMonth");
+  if (currentMonthEl) {
+    currentMonthEl.textContent = `${month} ${year}`;
+  }
+
+  // Update chart title dynamically
+  const chartTitle = document.getElementById("chartTitle");
+  if (chartTitle) {
+    chartTitle.textContent = `Expenses Overview – ${month} ${year}`;
+  }
+
+  // Initialize Chart.js
   const ctx = document.getElementById('expensesChart').getContext('2d');
   new Chart(ctx, {
     type: 'line',
@@ -115,5 +167,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// Modal functions
+function openBudgetModal() {
+  document.getElementById('budgetModal').classList.remove('hidden');
+}
+function closeBudgetModal() {
+  document.getElementById('budgetModal').classList.add('hidden');
+}
 </script>
+<canvas id="categoryChart"></canvas>
 {% endblock %}
