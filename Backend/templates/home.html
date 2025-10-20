@@ -29,104 +29,38 @@
     <div class="w-full h-44 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
       <div class="text-center flex flex-col justify-center items-center border-white rounded-2xl bg-white bg-opacity-20 p-4 m-2 gap-2">
         <img src="{% static 'Sources/upload.png' %}" alt="" width="100px">
-        <button class="bg-black rounded-xl p-2 opacity-80 hover:opacity-100 transition">
-          <h2 class="font-bold text-xl">Upload Image</h2>
-        </button>
-      </div>
-    </div>
-
-    <div class="mt-8 flex flex-col gap-4">
-      <div class="p-3 glass-card rounded-lg border border-white/10">
-        <p class="text-sm font-medium">Upload your Image / Screenshot of payment here</p>
-      </div>
-      <div class="p-3 glass-card rounded-lg border border-white/10">
-        <p class="text-sm font-medium">Or Add Expense Manually</p>
       </div>
     </div>
 
     <!-- Expense Form -->
-    <form id="expenseForm" class="mt-6 flex flex-col gap-4 text-left">
+    <form id="expenseForm" method="POST" action="{% url 'add_expense' %}" class="mt-6 flex flex-col gap-4 text-left">
+      {% csrf_token %}
       <label class="text-sm font-medium">Select Date:</label>
-      <input type="date" id="expense-date" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" />
+      <input type="date" name="date" id="expense-date" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required/>
 
       <label class="text-sm font-medium">Category:</label>
-      <div class="relative">
-        <select id="category" class="animated-select w-full p-3 rounded-lg glass-card text-white border border-white/10 bg-transparent focus:ring-2 focus:ring-white/30 transition-all duration-300">
-          <option value="" disabled selected>Select category</option>
-          <option value="Food">🍽️ Food</option>
-          <option value="Travel">🚗 Travel</option>
-          <option value="Shopping">🛍️ Shopping</option>
-          <option value="Personal">💼 Personal</option>
-        </select>
-      </div>
+      <select name="category" id="category" class="animated-select w-full p-3 rounded-lg glass-card text-white border border-white/10 bg-transparent focus:ring-2 focus:ring-white/30 transition-all duration-300" required>
+        <option value="" disabled selected>Select category</option>
+        <option value="Food">🍽️ Food</option>
+        <option value="Travel">🚗 Travel</option>
+        <option value="Shopping">🛍️ Shopping</option>
+        <option value="Personal">💼 Personal</option>
+      </select>
 
       <label class="text-sm font-medium">Amount:</label>
-      <input type="number" id="amount" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required />
+      <input type="number" name="amount" id="amount" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required />
 
-      <label class="text-sm font-medium">Discription :</label>
-      <input type="text" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10"/>
-      
+      <label class="text-sm font-medium">Description:</label>
+      <input type="text" name="description" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10"/>
+
       <button type="submit" class="w-full mt-6">
         <div class="h-14 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
           Add Expense
         </div>
       </button>
     </form>
-
-    <!-- Success Message -->
-    <div id="success-message" class="hidden mt-6 text-green-400 text-lg font-semibold opacity-0 transition-opacity duration-500">
-      ✅ Expense Added Successfully!
-    </div>
-
-    <!-- Dashboard Button (hidden initially) -->
-    <div id="dashboard-btn" class="hidden mt-4 opacity-0 transition-opacity duration-500">
-      <a href="{% url 'dashboard' %}" class="px-6 py-3 rounded-lg font-semibold border border-white/30 hover:bg-white hover:text-black transition">
-        Go to Dashboard
-      </a>
-    </div>
-
   </div>
 </div>
-
-<!-- Styling for Dropdown Animation -->
-<style>
-  .animated-select option {
-    background-color: rgba(10, 20, 40, 0.8);
-    color: white;
-    backdrop-filter: blur(10px);
-  }
-
-  .animated-select:focus {
-    animation: glow 0.3s ease-in-out;
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  @keyframes glow {
-    from {
-      box-shadow: 0 0 0px rgba(255, 255, 255, 0);
-      transform: translateY(2px);
-    }
-    to {
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-      transform: translateY(0);
-    }
-  }
-
-  select.animated-select:focus option {
-    animation: fadeIn 0.25s ease-in-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(3px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-</style>
 
 <script>
   // Date + Time display
@@ -135,10 +69,8 @@
     let hours = now.getHours().toString().padStart(2, '0');
     let minutes = now.getMinutes().toString().padStart(2, '0');
     document.getElementById('time').textContent = `Time : ${hours}:${minutes} hrs`;
-
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     document.getElementById('day').textContent = `Day : ${days[now.getDay()]}`;
-
     let day = now.getDate().toString().padStart(2, '0');
     let month = (now.getMonth() + 1).toString().padStart(2, '0');
     let year = now.getFullYear();
@@ -146,41 +78,10 @@
   }
   updateDateTime();
   setInterval(updateDateTime, 60000);
-
-  // Default date for input
   document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("expense-date").value = today;
   });
-
-  // Expense Form Submission with Success Popup
-  document.getElementById("expenseForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const amount = document.getElementById("amount").value.trim();
-    if (!amount || parseFloat(amount) <= 0) {
-      alert("Please enter a valid amount before adding expense.");
-      return;
-    }
-
-    const successMsg = document.getElementById("success-message");
-    const dashboardBtn = document.getElementById("dashboard-btn");
-
-    // Show success message smoothly
-    successMsg.classList.remove("hidden");
-    setTimeout(() => successMsg.classList.add("opacity-100"), 100);
-
-    // Then reveal dashboard button after a delay
-    setTimeout(() => {
-      dashboardBtn.classList.remove("hidden");
-      setTimeout(() => dashboardBtn.classList.add("opacity-100"), 100);
-    }, 800);
-
-    // Reset form
-    e.target.reset();
-  });
 </script>
 
 {% endblock %}
-
-

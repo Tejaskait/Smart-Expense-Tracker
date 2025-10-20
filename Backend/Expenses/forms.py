@@ -4,4 +4,4 @@ from .models import Expenses
 class ExpenseImageUploadForm(forms.ModelForm):
     class Meta:
         model = Expenses
-        fields = ['image']  # the field the user will upload
+        fields = ['image']

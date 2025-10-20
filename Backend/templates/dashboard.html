@@ -1,180 +1,165 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard - Smart Expense Tracker{% endblock %}
-
+{% load static %}
 {% block content %}
-<section class="max-w-6xl mx-auto mb-16 px-6">
 
-  <!-- Dashboard Header -->
-  <div class="text-center mb-10">
-    <h2 class="text-4xl font-bold mb-2">Your Dashboard</h2>
-    <p class="text-gray-200">A summary of your recent spending and budget overview.</p>
-  </div>
+<section class="max-w-7xl mx-auto p-6 text-white">
+  <h1 class="text-4xl font-bold mb-6 text-center">Expense Dashboard</h1>
 
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    
-    <!-- Total Expenses Card -->
-    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform flex flex-col justify-between">
-      <div>
-        <h3 class="text-xl font-semibold mb-2">Total Expenses</h3>
-        <p class="text-3xl font-bold text-yellow-300">₹12,450</p>
-        <p id="currentMonth" class="text-sm text-gray-300 mt-2"></p>
-      </div>
-      <a href="{% url 'home' %}" 
-         class="mt-4 inline-block bg-yellow-400 text-black font-semibold py-2 px-4 rounded-xl hover:bg-yellow-500 transition">
-        + Add Expense
-      </a>
+  <!-- 💰 Budget & Summary Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-semibold mb-2">Total Expenses</h2>
+      <p class="text-3xl font-bold text-red-400">₹{{ total_expenses }}</p>
     </div>
-
-    <!-- Monthly Budget Card -->
-    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform flex flex-col justify-between">
-      <div>
-        <h3 class="text-xl font-semibold mb-2">Monthly Budget</h3>
-        <p class="text-3xl font-bold text-green-300">₹25,000</p>
-        <p class="text-sm text-gray-300 mt-2">Target Budget</p>
-      </div>
-      <button 
-        class="mt-4 inline-block bg-green-400 text-black font-semibold py-2 px-4 rounded-xl hover:bg-green-500 transition"
-        onclick="openBudgetModal()">
-        ✏️ Set Budget
-      </button>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-semibold mb-2">Remaining Balance</h2>
+      <p class="text-3xl font-bold text-green-400">₹{{ remaining_balance }}</p>
     </div>
-
-    <!-- Remaining Balance Card -->
-    <div class="glass-card p-6 rounded-2xl shadow-lg hover:scale-105 transition-transform">
-      <h3 class="text-xl font-semibold mb-2">Remaining Balance</h3>
-      <p class="text-3xl font-bold text-red-300">₹12,550</p>
-      <p class="text-sm text-gray-300 mt-2">You’re doing great!</p>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
+      <h2 class="text-xl font-semibold mb-2">Monthly Budget</h2>
+      <form method="POST" action="{% url 'set_budget' %}" class="flex items-center gap-3">
+        {% csrf_token %}
+        <input
+          type="number"
+          name="budget"
+          value="{{ monthly_budget }}"
+          class="p-2 rounded bg-gray-800 text-white w-32"
+        />
+        <button
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold"
+        >
+          Set
+        </button>
+      </form>
     </div>
   </div>
 
-  <!-- Chart Section -->
-  <div class="glass-card rounded-2xl shadow-lg p-6 mb-10">
-    <h3 id="chartTitle" class="text-2xl font-semibold mb-4">Expenses Overview</h3>
-    <canvas id="expensesChart" height="120"></canvas>
+  <!-- 📈 Charts Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
+      <h2 class="text-lg font-semibold mb-4">Monthly Expense Chart</h2>
+      <canvas id="monthChart"></canvas>
+    </div>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
+      <h2 class="text-lg font-semibold mb-4">Category-wise Expense</h2>
+      <canvas id="categoryChart"></canvas>
+    </div>
   </div>
 
-  <!-- Recent Transactions Table -->
-  <div class="glass-card rounded-2xl shadow-lg p-6 overflow-x-auto">
-    <h3 class="text-2xl font-semibold mb-4">Recent Transactions</h3>
-    <table class="w-full text-left border-collapse text-white">
-      <thead>
-        <tr class="border-b border-white/20">
-          <th class="py-2 px-3">Date</th>
-          <th class="py-2 px-3">Category</th>
-          <th class="py-2 px-3">Description</th>
-          <th class="py-2 px-3">Amount</th>
+  <!-- 🧾 Recent Transactions -->
+  <h2 class="text-2xl font-bold mb-3">Recent Transactions</h2>
+
+  <!-- 🔽 Month Filter -->
+  <form id="filter-form" method="get" class="mb-4">
+    <label for="month" class="text-white font-medium">Filter by Month:</label>
+    <select
+      name="month"
+      id="month"
+      class="ml-2 p-2 rounded bg-gray-800 text-white"
+    >
+      <option value="all" {% if selected_month == 'all' %}selected{% endif %}>All</option>
+      {% for m in month_names %}
+      <option value="{{ forloop.counter }}" {% if selected_month == forloop.counter|stringformat:'s' %}selected{% endif %}>
+        {{ m }}
+      </option>
+      {% endfor %}
+    </select>
+  </form>
+
+  <!-- 💰 Transactions Table -->
+  <div id="transactions-table" class="overflow-x-auto bg-gray-900 rounded-lg shadow-md">
+    <table class="min-w-full text-left text-white">
+      <thead class="bg-gray-800">
+        <tr>
+          <th class="p-3">Date</th>
+          <th class="p-3">Category</th>
+          <th class="p-3">Merchant</th>
+          <th class="p-3">Amount (₹)</th>
+          <th class="p-3 text-center">Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b border-white/10 hover:bg-white/5 transition">
-          <td class="py-2 px-3">2025-10-12</td>
-          <td class="py-2 px-3">Food</td>
-          <td class="py-2 px-3">Zomato Order</td>
-          <td class="py-2 px-3 text-yellow-300">₹450</td>
+        {% for expense in expenses %}
+        <tr class="border-b border-gray-700 hover:bg-gray-800 transition">
+          <td class="p-3">{{ expense.date }}</td>
+          <td class="p-3">{{ expense.category }}</td>
+          <td class="p-3">{{ expense.merchant }}</td>
+          <td class="p-3">{{ expense.amount }}</td>
+          <td class="p-3 text-center">
+            <button
+              class="text-red-400 hover:text-red-600 font-semibold delete-btn"
+              data-id="{{ expense.id }}"
+            >
+              Delete
+            </button>
+          </td>
         </tr>
-        <tr class="border-b border-white/10 hover:bg-white/5 transition">
-          <td class="py-2 px-3">2025-10-14</td>
-          <td class="py-2 px-3">Travel</td>
-          <td class="py-2 px-3">Uber Ride</td>
-          <td class="py-2 px-3 text-yellow-300">₹1,200</td>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="p-3 text-center text-gray-400">No transactions found.</td>
         </tr>
-        <tr class="hover:bg-white/5 transition">
-          <td class="py-2 px-3">2025-10-15</td>
-          <td class="py-2 px-3">Shopping</td>
-          <td class="py-2 px-3">Amazon Purchase</td>
-          <td class="py-2 px-3 text-yellow-300">₹2,000</td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>
 </section>
 
-<!-- Set Budget Modal -->
-<div id="budgetModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl w-96">
-    <h3 class="text-2xl font-semibold mb-4">Set Monthly Budget</h3>
-    <form>
-      <input type="number" placeholder="Enter new budget amount"
-             class="w-full p-3 rounded-lg text-black mb-4 focus:outline-none" required>
-      <div class="flex justify-end space-x-3">
-        <button type="button" onclick="closeBudgetModal()"
-                class="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">Cancel</button>
-        <button type="submit"
-                class="px-4 py-2 rounded-lg bg-green-400 text-black font-semibold hover:bg-green-500">Save</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Chart.js Script -->
-{% block extra_head %}
+<!-- 📊 Charts Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Get current month and year
-  const now = new Date();
-  const month = now.toLocaleString('default', { month: 'long' });
-  const year = now.getFullYear();
-
-  // Display current month in Total Expenses
-  const currentMonthEl = document.getElementById("currentMonth");
-  if (currentMonthEl) {
-    currentMonthEl.textContent = `${month} ${year}`;
-  }
-
-  // Update chart title dynamically
-  const chartTitle = document.getElementById("chartTitle");
-  if (chartTitle) {
-    chartTitle.textContent = `Expenses Overview – ${month} ${year}`;
-  }
-
-  // Initialize Chart.js
-  const ctx = document.getElementById('expensesChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
+  const monthCtx = document.getElementById('monthChart').getContext('2d');
+  new Chart(monthCtx, {
+    type: 'bar',
     data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      labels: {{ month_names|safe }},
       datasets: [{
-        label: 'Expenses (₹)',
-        data: [8000, 12500, 10000, 14500, 12000, 9500],
-        borderColor: 'rgba(255,255,255,0.9)',
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderWidth: 2,
-        fill: true,
-        tension: 0.3,
-        pointRadius: 5,
-        pointBackgroundColor: 'rgba(255,255,255,0.8)',
+        label: 'Monthly Expenses (₹)',
+        data: {{ month_values|safe }},
+        backgroundColor: 'rgba(59,130,246,0.7)',
       }]
     },
     options: {
-      responsive: true,
-      scales: {
-        x: {
-          ticks: { color: '#ddd' },
-          grid: { color: 'rgba(255,255,255,0.1)' }
-        },
-        y: {
-          ticks: { color: '#ddd' },
-          grid: { color: 'rgba(255,255,255,0.1)' }
-        }
-      },
-      plugins: {
-        legend: { labels: { color: '#fff' } }
-      }
+      scales: { y: { beginAtZero: true } }
     }
   });
+
+  const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+  new Chart(categoryCtx, {
+    type: 'doughnut',
+    data: {
+      labels: [{% for e in expenses %}'{{ e.category }}',{% endfor %}],
+      datasets: [{
+        data: [{% for e in expenses %}{{ e.amount }},{% endfor %}],
+        backgroundColor: ['#3b82f6', '#22c55e', '#ef4444', '#eab308', '#8b5cf6', '#06b6d4'],
+      }]
+    },
+  });
+</script>
+
+<!-- ⚙️ AJAX Script -->
+<script>
+document.getElementById('month').addEventListener('change', function() {
+  const month = this.value;
+  fetch(`?month=${month}`)
+    .then(res => res.text())
+    .then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      document.querySelector('#transactions-table').innerHTML =
+        doc.querySelector('#transactions-table').innerHTML;
+    });
 });
 
-// Modal functions
-function openBudgetModal() {
-  document.getElementById('budgetModal').classList.remove('hidden');
-}
-function closeBudgetModal() {
-  document.getElementById('budgetModal').classList.add('hidden');
-}
+// 🗑️ Delete button with AJAX
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('delete-btn')) {
+    const id = e.target.getAttribute('data-id');
+    fetch(`/delete-expense/${id}/`)
+      .then(() => location.reload());
+  }
+});
 </script>
-<canvas id="categoryChart"></canvas>
+
 {% endblock %}

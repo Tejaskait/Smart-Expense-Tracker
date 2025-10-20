@@ -1,74 +1,101 @@
-from django.shortcuts import render
-from .forms import ExpenseImageUploadForm
-from .models import Expenses
-from PIL import Image
-import pytesseract
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Sum
 from datetime import datetime
-from django.shortcuts import render, redirect
+import calendar
+from .models import Expenses
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
-from django.contrib.auth.decorators import login_required
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
+# 🏠 Home Page
 def home(request):
     return render(request, 'home.html')
 
-def dashboard(request):
-    return render(request, 'dashboard.html')
 
+# ➕ Add Expense
+def add_expense(request):
+    if request.method == "POST":
+        date = request.POST.get("date")
+        category = request.POST.get("category")
+        amount = request.POST.get("amount")
+        description = request.POST.get("description")
+
+        if amount:
+            Expenses.objects.create(
+                amount=float(amount),
+                date=date,
+                category=category,
+                merchant=description or "Manual Entry"
+            )
+        return redirect("dashboard")
+
+    return redirect("home")
+
+
+# 🗑️ Delete Expense
+def delete_expense(request, expense_id):
+    expense = get_object_or_404(Expenses, id=expense_id)
+    expense.delete()
+    return redirect("dashboard")
+
+
+# 📊 Dashboard Page
+def dashboard(request):
+    # 🔹 Handle month filter
+    selected_month = request.GET.get('month')
+    expenses = Expenses.objects.all().order_by('-date')
+
+    if selected_month and selected_month != "all":
+        expenses = expenses.filter(date__month=int(selected_month))
+
+    total_expenses = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Load budget from session (default ₹25000)
+    monthly_budget = request.session.get("monthly_budget", 25000)
+    remaining_balance = monthly_budget - total_expenses
+
+    # Monthly expense chart data
+    month_names, month_values = [], []
+    for m in range(1, 13):
+        month_names.append(calendar.month_abbr[m])
+        total = Expenses.objects.filter(date__month=m).aggregate(Sum('amount'))['amount__sum'] or 0
+        month_values.append(total)
+
+    context = {
+        "expenses": expenses,
+        "total_expenses": total_expenses,
+        "monthly_budget": monthly_budget,
+        "remaining_balance": remaining_balance,
+        "month_names": month_names,
+        "month_values": month_values,
+        "selected_month": selected_month or "all",
+    }
+    return render(request, "dashboard.html", context)
+
+
+# 💰 Set Monthly Budget
+def set_budget(request):
+    if request.method == "POST":
+        budget = request.POST.get("budget")
+        if budget:
+            request.session["monthly_budget"] = float(budget)
+        return redirect("dashboard")
+    return redirect("dashboard")
+
+
+# ℹ️ About Page
 def about(request):
     return render(request, 'about.html')
-    
+
+
+# 🧾 Signup Page
 def signup(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # log in the user immediately after signup
             auth_login(request, user)
             return redirect("home")
     else:
         form = UserCreationForm()
     return render(request, "registration/signup.html", {"form": form})
-
-def upload_expense_image(request):
-    if request.method == "POST":
-        form = ExpenseImageUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            img = Image.open(request.FILES['image'])
-            
-            # OCR text extraction
-            text = pytesseract.image_to_string(img)
-
-            # Simple parsing logic (adjust as needed)
-            merchant = "Unknown"
-            amount = 0.0
-            date = datetime.today().date()
-
-            lines = text.split("\n")
-            for line in lines:
-                line = line.strip()
-                if line.lower().startswith("paid to"):
-                    merchant = line[8:].strip()
-                elif line.replace('.', '', 1).isdigit():  # crude amount detection
-                    amount = float(line)
-
-            expense = Expenses.objects.create(
-                merchant=merchant,
-                amount=amount,
-                date=date,
-                image=request.FILES['image']
-            )
-
-            # Pass saved data to template
-            context = {
-                'merchant': expense.merchant,
-                'amount': expense.amount,
-                'date': expense.date
-            }
-            return render(request, 'upload_success.html', context)
-    else:
-        form = ExpenseImageUploadForm()
-    
-    return render(request, 'upload_expense.html', {'form': form})
