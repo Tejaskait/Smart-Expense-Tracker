@@ -9,5 +9,10 @@ urlpatterns = [
     path('add-expense/', views.add_expense, name='add_expense'),
     path('set-budget/', views.set_budget, name='set_budget'),
     path('delete-expense/<int:expense_id>/', views.delete_expense, name='delete_expense'),
-    path('signup/', views.signup, name='signup'),
+    path('login/', views.login_view, name='login'),
+path('signup/', views.signup_view, name='signup'),
+path('logout/', views.logout_view, name='logout'),
+path('profile/', views.profile_view, name='profile'),
+
+
 ]
