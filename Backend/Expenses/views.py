@@ -11,6 +11,11 @@ import google.generativeai as genai
 from io import BytesIO
 import json
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+
 
 # -----------------------------
 # Configure Gemini API
@@ -24,7 +29,48 @@ def home(request):
     return render(request, 'home.html')
 
 
+from datetime import date, timedelta
+from django.db.models import Sum
+
+@login_required
+def profile_view(request):
+    # Get all expenses for the current user
+    expenses = Expenses.objects.filter(user=request.user)
+
+    # Map each date → total spent on that date
+    daily_expenses = (
+        expenses.values('date')
+        .annotate(total=Sum('amount'))
+        .order_by('date')
+    )
+
+    # Create a dictionary for quick lookup
+    expense_map = {d['date']: float(d['total']) for d in daily_expenses}
+
+    # Build last 90 days (or 3 months) of history
+    today = date.today()
+    start_date = today - timedelta(days=89)
+    days = [start_date + timedelta(days=i) for i in range(90)]
+
+    # Normalize total expense values to color intensity
+    max_expense = max(expense_map.values()) if expense_map else 0
+    graph_data = []
+    for d in days:
+        amt = expense_map.get(d, 0)
+        if max_expense > 0:
+            intensity = int((amt / max_expense) * 100)
+        else:
+            intensity = 0
+        graph_data.append({
+            "date": d,
+            "amount": amt,
+            "intensity": intensity
+        })
+
+    return render(request, "profile.html", {"graph_data": graph_data, "user": request.user})
+
 # ➕ Add Expense
+@login_required
 def add_expense(request):
     if request.method == "POST":
         date = request.POST.get("date")
@@ -37,8 +83,10 @@ def add_expense(request):
                 amount=float(amount),
                 date=date,
                 category=category,
-                merchant=description or "Manual Entry"
+                merchant=description or "Manual Entry",
+                user=request.user if request.user.is_authenticated else None
             )
+
         return redirect("dashboard")
 
     return redirect("home")
@@ -50,12 +98,51 @@ def delete_expense(request, expense_id):
     expense.delete()
     return redirect("dashboard")
 
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("dashboard")
+        else:
+            return render(request, "registration/login.html", {"error": "Invalid credentials"})
+    return render(request, "registration/login.html")
+
+
+
+def signup_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        if User.objects.filter(username=username).exists():
+            return render(request, "registration/signup.html", {"error": "Username already exists"})
+        user = User.objects.create_user(username=username, email=email, password=password)
+        login(request, user)
+        return redirect("dashboard")
+    return render(request, "registration/signup.html")
+
+
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect("login")
+
+
 
 # 📊 Dashboard Page
+@login_required
 def dashboard(request):
     # 🔹 Handle month filter
     selected_month = request.GET.get('month')
-    expenses = Expenses.objects.all().order_by('-date')
+    if request.user.is_authenticated:
+        expenses = Expenses.objects.filter(user=request.user).order_by('-date')
+    else:
+        expenses = Expenses.objects.none()
+
 
     if selected_month and selected_month != "all":
         expenses = expenses.filter(date__month=int(selected_month))
@@ -126,6 +213,7 @@ def signup(request):
 # -----------------------------
 # Upload Expense Image (Gemini OCR)
 # -----------------------------
+
 def upload_expense_image(request):
     if request.method == "POST":
         form = ExpenseImageUploadForm(request.POST, request.FILES)
@@ -179,8 +267,10 @@ def upload_expense_image(request):
                 merchant=merchant,
                 amount=amount,
                 date=date,
-                image=request.FILES['image']
+                image=request.FILES.get('image'),
+                user=request.user if request.user.is_authenticated else None
             )
+
 
             # Render result
             context = {
