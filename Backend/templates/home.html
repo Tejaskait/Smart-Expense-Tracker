@@ -39,6 +39,7 @@
       <button id="uploadImageBtn" class="h-14 px-4 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300 ">
         Upload Payment Screenshot
       </button>
+      <input type="file" id="uploadInput" accept="image/*" class="hidden">
 
       <p class="text-white/70 text-center text-sm sm:text-base">Or Add Expense Manually</p>
     </div>
@@ -144,6 +145,70 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "{% url 'dashboard' %}";
   });
 });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const uploadBtn = document.getElementById("uploadImageBtn");
+    const uploadInput = document.getElementById("uploadInput");
+
+    uploadBtn.addEventListener("click", () => uploadInput.click());
+
+    uploadInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+            const response = await fetch("{% url 'upload_expense_image' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert("❌ Upload failed: " + data.error);
+                return;
+            }
+
+            // ✅ Upload successful
+            alert(`✅ Expense Added!\nMerchant: ${data.merchant}\nAmount: ₹${data.amount}\nDate: ${data.date}`);
+
+            // Optionally: update dashboard table dynamically
+            const tableBody = document.querySelector("#transactions-table tbody");
+            if (tableBody) {
+                const tr = document.createElement("tr");
+                tr.classList.add("border-b", "border-gray-700", "hover:bg-gray-800");
+                tr.innerHTML = `
+                    <td class="p-3">${data.date}</td>
+                    <td class="p-3">${data.category}</td>
+                    <td class="p-3">${data.merchant}</td>
+                    <td class="p-3">${data.amount}</td>
+                    <td class="p-3 text-center">
+                        <button class="text-red-400 hover:text-red-600 font-semibold delete-btn" data-id="${data.id}">Delete</button>
+                    </td>
+                `;
+                tableBody.prepend(tr); // add on top
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("❌ Upload failed. Check console.");
+        }
+    });
+
+    function getCSRFToken() {
+        const name = "csrftoken";
+        return document.cookie.split("; ").find(r => r.startsWith(name+"="))?.split("=")[1];
+    }
+});
+
 </script>
 
 {% endblock %}
