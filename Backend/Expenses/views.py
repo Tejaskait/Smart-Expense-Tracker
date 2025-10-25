@@ -16,6 +16,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.http import JsonResponse
+from django.db.models import Sum
+from django.contrib.auth.models import User
+from .models import Expenses
+
 
 
 
@@ -36,40 +40,36 @@ from django.db.models import Sum
 
 @login_required
 def profile_view(request):
-    # Get all expenses for the current user
-    expenses = Expenses.objects.filter(user=request.user)
+    # --- Calculate User Stats ---
+    total_spent = Expenses.objects.filter(user=request.user).aggregate(Sum('amount'))['amount__sum'] or 0
+    total_transactions = Expenses.objects.filter(user=request.user).count()
+    avg_daily_expense = round(total_spent / 90, 2) if total_spent else 0
 
-    # Map each date → total spent on that date
-    daily_expenses = (
-        expenses.values('date')
-        .annotate(total=Sum('amount'))
-        .order_by('date')
-    )
+    # --- Handle Profile Update ---
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
 
-    # Create a dictionary for quick lookup
-    expense_map = {d['date']: float(d['total']) for d in daily_expenses}
-
-    # Build last 90 days (or 3 months) of history
-    today = date.today()
-    start_date = today - timedelta(days=89)
-    days = [start_date + timedelta(days=i) for i in range(90)]
-
-    # Normalize total expense values to color intensity
-    max_expense = max(expense_map.values()) if expense_map else 0
-    graph_data = []
-    for d in days:
-        amt = expense_map.get(d, 0)
-        if max_expense > 0:
-            intensity = int((amt / max_expense) * 100)
+        # Check for duplicates
+        if User.objects.exclude(id=request.user.id).filter(username=username).exists():
+            messages.error(request, "Username already taken.")
+        elif User.objects.exclude(id=request.user.id).filter(email=email).exists():
+            messages.error(request, "Email already in use.")
         else:
-            intensity = 0
-        graph_data.append({
-            "date": d,
-            "amount": amt,
-            "intensity": intensity
-        })
+            user = request.user
+            user.username = username
+            user.email = email
+            user.save()
+            messages.success(request, "Profile updated successfully ✅")
+            return redirect('profile')  # refresh page
 
-    return render(request, "profile.html", {"graph_data": graph_data, "user": request.user})
+    context = {
+        "user": request.user,
+        "total_spent": total_spent,
+        "total_transactions": total_transactions,
+        "avg_daily_expense": avg_daily_expense,
+    }
+    return render(request, "profile.html", context)
 
 # ➕ Add Expense
 @login_required
