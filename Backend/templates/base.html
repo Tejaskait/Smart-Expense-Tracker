@@ -83,9 +83,16 @@ header {
       <a href="{% url 'home' %}" class="nav-btn">Home</a>
       <a href="{% url 'dashboard' %}" class="nav-btn">Dashboard</a>
       <a href="{% url 'about' %}" class="nav-btn">Help</a>
-      <a href="{% url 'login' %}" class="nav-btn flex items-center gap-2">
-        <img src="{% static 'Sources/profile-logo.png' %}" width="25" alt=""> Profile
-      </a>
+      {% if user.is_authenticated %}
+  <a href="{% url 'profile' %}" class="nav-btn flex items-center gap-2">
+    <img src="{% static 'Sources/profile-logo.png' %}" width="25" alt=""> Profile
+  </a>
+{% else %}
+  <a href="{% url 'login' %}" class="nav-btn flex items-center gap-2">
+    <img src="{% static 'Sources/profile-logo.png' %}" width="25" alt=""> Profile
+  </a>
+{% endif %}
+
     </nav>
 
     <div class="md:hidden">
