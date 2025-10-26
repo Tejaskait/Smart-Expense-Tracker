@@ -24,10 +24,15 @@
   </div>
 </section>
 
-<!-- Upload / Add Expense Section -->
-<div id="upload-section" class="upload-section flex justify-center px-4 py-12">
-  <div class="w-full md:w-4/5 flex flex-col gap-6">
-    <div class="flex flex-col md:flex-row gap-6">
+    <!-- Upload / Add Expense Section -->
+    <div id="upload-section" class="upload-section flex justify-center px-4 py-12">
+      <div class="w-full md:w-4/5 flex flex-col gap-6">
+      <div class="flex flex-col md:flex-row gap-6">
+
+      <!-- OCR Confirmation Message (Outside Upload Div) -->
+    <div id="ocrConfirmation" class="mt-4 p-4 border border-white/20 rounded-lg bg-green-600 text-white font-semibold shadow-lg text-center hidden">
+      ✅ Expense Added Successfully!
+    </div>
 
       <!-- Left: Upload Screenshot (Compact + Loader) -->
 <div class="w-full md:w-1/2 p-6 glass-card rounded-2xl shadow-2xl text-center border border-white/10 justify-center items-center flex flex-col relative">
@@ -83,6 +88,7 @@
             <option value="Travel" class="text-black">🚗 Travel</option>
             <option value="Shopping" class="text-black">🛍️ Shopping</option>
             <option value="Personal" class="text-black">💼 Personal</option>
+            <option value="Personal" class="text-black">📝 Other</option>
           </select>
 
           <label class="text-sm font-medium">Amount:</label>
@@ -198,13 +204,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+
 <!-- Upload Image Script with Overlay & Spinner -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const uploadInput = document.getElementById("uploadInput");
     const uploadOverlay = document.getElementById("uploadOverlay");
-
+    const uploadContent = document.getElementById("uploadContent");
     const resultBox = document.getElementById("ocrResult");
+    const ocrConfirmation = document.getElementById("ocrConfirmation");
+
     const merchantEl = document.getElementById("ocr-merchant");
     const amountEl = document.getElementById("ocr-amount");
     const categoryEl = document.getElementById("ocr-category");
@@ -213,7 +222,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const expenseDateInput = document.getElementById("expense-date");
     const expenseAmountInput = document.getElementById("amount");
     const expenseCategorySelect = document.getElementById("category");
+    const descriptionInput = document.getElementById("Description");
 
+    // ✅ Clear all fields on page load
+    function clearAllFields() {
+        merchantEl.textContent = "";
+        amountEl.textContent = "";
+        categoryEl.textContent = "";
+        ocrDateEl.textContent = "";
+        expenseDateInput.value = "";
+        expenseAmountInput.value = "";
+        expenseCategorySelect.value = "";
+        descriptionInput.value = "";
+        uploadContent.style.display = "flex";
+        resultBox.classList.add("hidden");
+        ocrConfirmation.classList.add("hidden");
+    }
+
+    clearAllFields();
+
+    // Handle image upload
     uploadInput.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -234,18 +262,30 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!data.error) {
-                // Fill OCR result box
+                // Fill OCR result
                 merchantEl.textContent = data.merchant || "Unknown";
                 amountEl.textContent = data.amount || "0.00";
                 categoryEl.textContent = data.category || "Other";
                 ocrDateEl.textContent = data.date || "-";
-                document.getElementById("uploadContent").style.display = "none";
+
+                uploadContent.style.display = "none";
                 resultBox.classList.remove("hidden");
 
                 // Auto-fill Add Expense form
                 if(data.date) expenseDateInput.value = data.date;
                 if(data.amount) expenseAmountInput.value = data.amount;
-                if(data.category) expenseCategorySelect.value = data.category;
+                if(data.category){
+                const normalizedCategory = data.category.trim().toLowerCase();
+                if(normalizedCategory === "food") expenseCategorySelect.value = "Food";
+                else if(normalizedCategory === "travel") expenseCategorySelect.value = "Travel";
+                else if(normalizedCategory === "shopping") expenseCategorySelect.value = "Shopping";
+                else if(normalizedCategory === "personal") expenseCategorySelect.value = "Personal";
+                else expenseCategorySelect.value = "Other"; // fallback for anything else
+                }
+
+
+                // Auto-fill description with merchant name
+                if(data.merchant) descriptionInput.value = data.merchant;
 
             } else {
                 merchantEl.textContent = "Upload failed";
@@ -264,12 +304,52 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Handle Confirm Button
+    const confirmBtn = document.getElementById("confirmBtn");
+    confirmBtn.addEventListener("click", async () => {
+        const payload = {
+            merchant: merchantEl.textContent,
+            amount: amountEl.textContent,
+            category: categoryEl.textContent,
+            date: ocrDateEl.textContent
+        };
+
+        try {
+            const res = await fetch("{% url 'confirm_expense' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if(data.message){
+                ocrConfirmation.textContent = data.message;
+                ocrConfirmation.classList.remove("hidden");
+
+                // Hide OCR result and show upload content
+                resultBox.classList.add("hidden");
+                uploadContent.style.display = "flex";
+
+                // Hide confirmation after 2 seconds
+                setTimeout(() => ocrConfirmation.classList.add("hidden"), 2000);
+
+                // Clear all form fields after confirm
+                clearAllFields();
+            }
+        } catch(err) {
+            console.error("Error confirming expense:", err);
+        }
+    });
+
     function getCSRFToken() {
         const name = "csrftoken";
         return document.cookie.split("; ").find(r => r.startsWith(name+"="))?.split("=")[1];
     }
 });
-
 </script>
+
 
 {% endblock %}

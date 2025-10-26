@@ -10,11 +10,11 @@ urlpatterns = [
     path('set-budget/', views.set_budget, name='set_budget'),
     path('delete-expense/<int:expense_id>/', views.delete_expense, name='delete_expense'),
     path('login/', views.login_view, name='login'),
-path('signup/', views.signup_view, name='signup'),
-path('logout/', views.logout_view, name='logout'),
-path('profile/', views.profile_view, name='profile'),
-path('delete-account/', views.delete_account, name='delete_account'),
-
+    path('signup/', views.signup_view, name='signup'),
+    path('logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile_view, name='profile'),
+    path('delete-account/', views.delete_account, name='delete_account'),
+    path('confirm_expense', views.confirm_expense, name='confirm_expense'),
 
 
 ]
