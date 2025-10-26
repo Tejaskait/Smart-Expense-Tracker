@@ -36,6 +36,7 @@
 
     <!-- Upload & Manual Add Buttons -->
     <div class="mt-4 flex flex-col gap-2 items-center">
+      <!-- ✅ Added auth guard -->
       <button id="uploadImageBtn" class="h-14 px-4 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300 ">
         Upload Payment Screenshot
       </button>
@@ -53,7 +54,7 @@
       <label class="text-sm font-medium">Category:</label>
       <select name="category" id="category" class="w-full p-3 rounded-lg glass-card text-white border border-white/10 bg-grey focus:ring-2 focus:ring-white/30 transition-all duration-300" required>
         <option value="" disabled selected>Select category</option>
-        <option value="Food " class="text-black">🍽️ Food</option>
+        <option value="Food" class="text-black">🍽️ Food</option>
         <option value="Travel" class="text-black">🚗 Travel</option>
         <option value="Shopping" class="text-black">🛍️ Shopping</option>
         <option value="Personal" class="text-black">💼 Personal</option>
@@ -63,7 +64,7 @@
       <input type="number" name="amount" id="amount" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required />
 
       <label class="text-sm font-medium">Description:</label>
-      <input type="text" name="description" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10"required />
+      <input type="text" name="description" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required />
 
       <button type="submit" class="w-full mt-6 relative">
         <div id="addExpenseBtn" class="h-14 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
@@ -82,6 +83,38 @@
   </div>
 </div>
 
+
+<!-- ✅ LOGIN CHECK SCRIPT (paste before other JS) -->
+<script>
+  const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+  const loginUrl = "{% url 'login' %}";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Protect Upload Screenshot
+    const uploadBtn = document.getElementById("uploadImageBtn");
+    const uploadInput = document.getElementById("uploadInput");
+
+    uploadBtn.addEventListener("click", (e) => {
+      if (!isAuthenticated) {
+        e.preventDefault();
+        window.location.href = `${loginUrl}?next=${window.location.pathname}#upload-section`;
+        return;
+      }
+      uploadInput.click();
+    });
+
+    // Protect Manual Add Expense
+    const expenseForm = document.getElementById("expenseForm");
+    expenseForm.addEventListener("submit", (e) => {
+      if (!isAuthenticated) {
+        e.preventDefault();
+        window.location.href = `${loginUrl}?next=${window.location.pathname}#upload-section`;
+      }
+    });
+  });
+</script>
+
+<!-- Existing scripts -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const today = new Date().toISOString().split('T')[0];
@@ -121,15 +154,10 @@ document.addEventListener("DOMContentLoaded", () => {
       body: new FormData(form),
     }).then(res => {
       if(res.ok) {
-        // Show floating modal with slide-up
         floatingModal.style.opacity = "1";
         floatingModal.style.transform = "translate(-50%, -12px)";
-
-        // Reset form
         form.reset();
         document.getElementById("expense-date").value = today;
-
-        // Hide modal after 3s
         setTimeout(() => {
           floatingModal.style.opacity = "0";
           floatingModal.style.transform = "translate(-50%, -2px)";
@@ -140,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }).catch(err => alert("Error: "+err));
   });
 
-  // Dashboard button click
   viewDashboardBtn.addEventListener("click", () => {
     window.location.href = "{% url 'dashboard' %}";
   });
@@ -151,8 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
     const uploadBtn = document.getElementById("uploadImageBtn");
     const uploadInput = document.getElementById("uploadInput");
-
-    uploadBtn.addEventListener("click", () => uploadInput.click());
 
     uploadInput.addEventListener("change", async (e) => {
         const file = e.target.files[0];
@@ -177,10 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // ✅ Upload successful
             alert(`✅ Expense Added!\nMerchant: ${data.merchant}\nAmount: ₹${data.amount}\nDate: ${data.date}`);
 
-            // Optionally: update dashboard table dynamically
             const tableBody = document.querySelector("#transactions-table tbody");
             if (tableBody) {
                 const tr = document.createElement("tr");
@@ -194,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <button class="text-red-400 hover:text-red-600 font-semibold delete-btn" data-id="${data.id}">Delete</button>
                     </td>
                 `;
-                tableBody.prepend(tr); // add on top
+                tableBody.prepend(tr);
             }
 
         } catch (err) {
@@ -208,7 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return document.cookie.split("; ").find(r => r.startsWith(name+"="))?.split("=")[1];
     }
 });
-
 </script>
 
 {% endblock %}
