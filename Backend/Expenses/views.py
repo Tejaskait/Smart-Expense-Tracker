@@ -74,7 +74,8 @@ def profile_view(request):
     return render(request, "profile.html", context)
 
 # ➕ Add Expense
-@login_required
+
+@login_required(login_url='login')
 def add_expense(request):
     if request.method == "POST":
         date = request.POST.get("date")
@@ -97,10 +98,12 @@ def add_expense(request):
 
 
 # 🗑️ Delete Expense
+
 def delete_expense(request, expense_id):
     expense = get_object_or_404(Expenses, id=expense_id)
     expense.delete()
     return redirect("dashboard")
+
 
 def login_view(request):
     if request.method == "POST":
@@ -187,6 +190,7 @@ def dashboard(request):
 
 
 # 💰 Set Monthly Budget
+@login_required
 def set_budget(request):
     if request.method == "POST":
         budget = request.POST.get("budget")
@@ -197,6 +201,7 @@ def set_budget(request):
 
 
 # ℹ️ About Page
+@login_required
 def about(request):
     return render(request, 'about.html')
 
