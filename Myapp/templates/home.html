@@ -29,22 +29,24 @@
   <div class="w-full md:w-4/5 flex flex-col gap-6">
     <div class="flex flex-col md:flex-row gap-6">
 
-      <!-- Left: Upload Screenshot -->
-      <div class="w-full md:w-1/2 p-6 glass-card rounded-2xl shadow-2xl text-center border border-white/10 justify-center items-center flex flex-col">
-        <div class="w-full h-44 sm:h-48 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
-          <button id="uploadImageBtn" >
-          <div class="flex flex-col items-center justify-center border-white rounded-2xl bg-white bg-opacity-20 p-4 gap-2 hover:bg-opacity-50">
-           
-            <img src="{% static 'Sources/upload.png' %}" alt="Upload" class="w-24 sm:w-28"><input type="file" id="uploadInput" accept="image/*" class="hidden">
-          </div></button>
-        </div>
-        <div class="mt-4 flex flex-col gap-2 items-center">
-          <button id="uploadImageBtn" class="h-14 px-4 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
-            Upload Payment Screenshot
-          </button>
-          <input type="file" id="uploadInput" accept="image/*" class="hidden">
-        </div>
-      </div>
+      <!-- Left: Upload Screenshot (Compact + Loader) -->
+<div class="w-full md:w-1/2 p-6 glass-card rounded-2xl shadow-2xl text-center border border-white/10 justify-center items-center flex flex-col relative">
+  <div id="uploadContainer" class="w-72 sm:w-80 py-16 sm:py-20 h-80 sm:h-80 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition transform hover:scale-105 border border-white relative">
+    <img src="{% static 'Sources/upload.png' %}" alt="Upload" class="w-24 sm:w-28 mb-2">
+    <span class="text-white font-medium">Upload Payment Screenshot</span>
+    <input type="file" id="uploadInput" accept="image/*" class="hidden">
+
+    <!-- Upload Overlay with Spinner -->
+    <div id="uploadOverlay" class="absolute inset-0 bg-black flex flex-col items-center justify-center text-white font-semibold text-lg rounded-lg opacity-0 pointer-events-none transition-opacity">
+      <svg class="animate-spin h-8 w-8 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      Uploading...
+    </div>
+  </div>
+</div>
+
 
       <!-- Right: Add Expense Manually -->
       <div class="w-full md:w-1/2 p-6 glass-card rounded-2xl shadow-2xl border border-white/10 relative">
@@ -102,36 +104,35 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     // Protect Upload Screenshot
-    const uploadBtn = document.getElementById("uploadImageBtn");
+    const uploadContainer = document.getElementById("uploadContainer");
     const uploadInput = document.getElementById("uploadInput");
 
-    uploadBtn.addEventListener("click", (e) => {
-      if (!isAuthenticated) {
-        e.preventDefault();
-        window.location.href = `${loginUrl}?next=${window.location.pathname}#upload-section`;
-        return;
-      }
-      uploadInput.click();
+    uploadContainer.addEventListener("click", (e) => {
+        if (!isAuthenticated) {
+            e.preventDefault();
+            window.location.href = `${loginUrl}?next=${window.location.pathname}#upload-section`;
+            return;
+        }
+        uploadInput.click();
     });
 
     // Protect Manual Add Expense
     const expenseForm = document.getElementById("expenseForm");
     expenseForm.addEventListener("submit", (e) => {
-      if (!isAuthenticated) {
-        e.preventDefault();
-        window.location.href = `${loginUrl}?next=${window.location.pathname}#upload-section`;
-      }
+        if (!isAuthenticated) {
+            e.preventDefault();
+            window.location.href = `${loginUrl}?next=${window.location.pathname}#upload-section`;
+        }
     });
   });
 </script>
 
-<!-- Existing scripts -->
+<!-- Date & Time Script -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById("expense-date").value = today;
 
-  // Update time, day, date
   const timeSpan = document.getElementById("time");
   const daySpan = document.getElementById("day");
   const dateSpan = document.getElementById("date");
@@ -185,9 +186,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+<!-- Upload Image Script with Overlay & Spinner -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const uploadInput = document.getElementById("uploadInput");
+    const uploadOverlay = document.getElementById("uploadOverlay");
 
     uploadInput.addEventListener("change", async (e) => {
         const file = e.target.files[0];
@@ -195,6 +198,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const formData = new FormData();
         formData.append("image", file);
+
+        // Show overlay with spinner
+        uploadOverlay.style.opacity = "1";
+        uploadOverlay.style.pointerEvents = "auto";
 
         try {
             const response = await fetch("{% url 'upload_expense_image' %}", {
@@ -209,14 +216,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.error) {
                 alert("❌ Upload failed: " + data.error);
-                return;
+            } else {
+                alert(`✅ Expense Added!\nMerchant: ${data.merchant}\nAmount: ₹${data.amount}\nDate: ${data.date}`);
             }
-
-            alert(`✅ Expense Added!\nMerchant: ${data.merchant}\nAmount: ₹${data.amount}\nDate: ${data.date}`);
 
         } catch (err) {
             console.error(err);
             alert("❌ Upload failed. Try Again !");
+        } finally {
+            // Hide overlay
+            uploadOverlay.style.opacity = "0";
+            uploadOverlay.style.pointerEvents = "none";
+            uploadInput.value = ""; // Reset input
         }
     });
 
