@@ -18,40 +18,53 @@
         Add Expense
       </a>
     </div>
+
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
       <h2 class="text-xl font-semibold mb-2">Remaining Balance</h2>
       <p class="text-3xl font-bold text-green-400">₹{{ remaining_balance }}</p>
     </div>
+
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
       <h2 class="text-xl font-semibold mb-2">Monthly Budget</h2>
       <form method="POST" action="{% url 'set_budget' %}" class="flex items-center gap-3">
         {% csrf_token %}
-        <input
-          type="number"
-          name="budget"
-          value="{{ monthly_budget }}"
-          class="p-2 rounded bg-gray-800 text-white w-32"
-        />
-        <button
-          type="submit"
-          class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold"
-        >
+        <input type="number" name="budget" value="{{ monthly_budget }}" class="p-2 rounded bg-gray-800 text-white w-32"/>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold">
           Set
         </button>
       </form>
     </div>
   </div>
 
-  <!-- 📈 Charts Section -->
-  <div class="grid w-5/6 grid-cols-1 md:grid-cols-2 gap-14 mb-10 flex justify-center">
-    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold mb-4">Monthly Expense Chart for this year -</h2>
-      <canvas id="monthChart"></canvas>
+  <!-- 📊 Chart Section with Toggle -->
+  <div class="bg-gray-900 p-6 rounded-2xl shadow-md mb-6 w-full md:w-5/6 mx-auto">
+    <div class="flex justify-center gap-4 mb-4">
+      <button class="chart-toggle bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold active" data-target="category">Category</button>
+      <button class="chart-toggle bg-green-500 hover:bg-green-700 px-4 py-2 rounded font-semibold" data-target="weekly">Weekly</button>
+      <button class="chart-toggle bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-semibold" data-target="monthly">Monthly</button>
     </div>
-    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold mb-4">Category-wise Expense for this month -</h2>
-      <canvas id="categoryChart"></canvas>
+
+    <div class="flex justify-center">
+      <canvas id="mergedChart" class="mx-auto"></canvas>
     </div>
+
+  <!-- 📋 Category Legend with Pie Chart Colors -->
+<div id="category-legend" class="mt-6">
+  <h3 class="text-xl font-semibold mb-4 text-center">Category-wise Totals</h3>
+  <div class="flex flex-wrap justify-center gap-4">
+    {% for label, value, color in category_totals %}
+    <div class="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded shadow-md">
+      <span class="w-4 h-4 rounded-full" style="background-color: {{ color }};"></span>
+      <span class="text-white font-semibold">{{ label }}: ₹{{ value }}</span>
+    </div>
+    {% empty %}
+    <p class="text-gray-400 text-center w-full">No data found.</p>
+    {% endfor %}
+  </div>
+</div>
+
+
+
   </div>
 
   <!-- 🧾 Recent Transactions -->
@@ -60,11 +73,7 @@
   <!-- 🔽 Month Filter -->
   <form id="filter-form" method="get" class="mb-4">
     <label for="month" class="text-white font-medium">Filter by Month:</label>
-    <select
-      name="month"
-      id="month"
-      class="ml-2 p-2 rounded bg-gray-800 text-white"
-    >
+    <select name="month" id="month" class="ml-2 p-2 rounded bg-gray-800 text-white">
       <option value="all" {% if selected_month == 'all' %}selected{% endif %}>All</option>
       {% for m in month_names %}
       <option value="{{ forloop.counter }}" {% if selected_month == forloop.counter|stringformat:'s' %}selected{% endif %}>
@@ -88,18 +97,13 @@
       </thead>
       <tbody>
         {% for expense in expenses %}
-       
-
         <tr class="border-b border-gray-700 hover:bg-gray-800 transition">
           <td class="p-3">{{ expense.date }}</td>
           <td class="p-3">{{ expense.category }}</td>
           <td class="p-3">{{ expense.merchant }}</td>
           <td class="p-3">{{ expense.amount }}</td>
           <td class="p-3 text-center">
-            <button
-              class="text-red-400 hover:text-red-600 font-semibold delete-btn"
-              data-id="{{ expense.id }}"
-            >
+            <button class="text-red-400 hover:text-red-600 font-semibold delete-btn" data-id="{{ expense.id }}">
               Delete
             </button>
           </td>
@@ -114,85 +118,109 @@
   </div>
 </section>
 
-<!-- 📊 Charts Script -->
+<!-- 📊 ChartJS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 <script>
-  // --- Monthly Expense Bar Chart ---
-  const monthCtx = document.getElementById('monthChart').getContext('2d');
-  new Chart(monthCtx, {
+let mergedChart;
+const ctx = document.getElementById('mergedChart').getContext('2d');
+
+const chartData = {
+  category: {
+    type: 'pie',
+    data: {
+      labels: {{ category_labels|safe }},
+      datasets: [{
+        data: {{ category_values|safe }},
+        backgroundColor: {{ category_colors|safe }},
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: 'white',
+          formatter: (value) => `₹${value}`
+        }
+      },
+      cutout: '40%',
+      radius: '100%'
+    },
+    plugins: [ChartDataLabels]
+  },
+  weekly: {
     type: 'bar',
     data: {
-      labels: {{ month_names|safe }},
+      labels: {{ week_labels|safe }},
       datasets: [{
-        label: 'Monthly Expenses (₹)',
-        data: {{ month_values|safe }},
-        backgroundColor: 'rgba(59,130,246,0.7)',
+        label: "Weekly Expenses (₹)",
+        data: {{ week_values|safe }},
+        backgroundColor: "rgba(0, 122, 73)"
       }]
     },
     options: {
       scales: { y: { beginAtZero: true } },
-      plugins: {
-        legend: { display: false }
-      }
+      plugins: { legend: { display: false } }
     }
-  });
+  },
+  monthly: {
+    type: 'bar',
+    data: {
+      labels: {{ month_names|safe }},
+      datasets: [{
+        label: "Monthly Expenses (₹)",
+        data: {{ month_values|safe }},
+        backgroundColor: 'rgba(128, 0, 199)',
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true } },
+      plugins: { legend: { display: false } }
+    }
+  }
+};
 
-  // --- Category Pie Chart ---
-  const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-  const categoryLabels = {{ category_labels|safe }};
-  const categoryValues = {{ category_values|safe }};
+function renderChart(type) {
+  if (mergedChart) mergedChart.destroy();
 
-  // Fixed unique colors
-  const categoryColors = [
-      '#3b82f6', '#22c55e', '#ef4444', '#eab308', 
-      '#8b5cf6', '#06b6d4', '#f97316', '#f43f5e',
-      '#a3e635', '#6366f1'
-  ];
-  while(categoryColors.length < categoryLabels.length){
-      categoryColors.push('#' + Math.floor(Math.random()*16777215).toString(16));
+  // Adjust canvas height for pie chart (smaller and centered)
+  if (type === 'category') {
+    ctx.canvas.height = 180; 
+    ctx.canvas.width = 180;
+  } else {
+    ctx.canvas.height = 320;
+    ctx.canvas.width = ctx.canvas.parentElement.offsetWidth;
   }
 
-  new Chart(categoryCtx, {
-      type: 'pie',
-      data: {
-          labels: categoryLabels,
-          datasets: [{
-              data: categoryValues,
-              backgroundColor: categoryColors.slice(0, categoryLabels.length)
-          }]
-      },
-      options: {
-          responsive: true,
-          plugins: {
-              legend: {
-                  position: 'right',
-                  labels: { color: 'white' }
-              },
-              tooltip: {
-                  callbacks: {
-                      label: function(context){
-                          return `${context.label}: ₹${context.parsed}`;
-                      }
-                  }
-              },
-              datalabels: {
-                  color: 'white',
-                  formatter: (value, ctx) => `₹${value}`
-              }
-          }
-      },
-      plugins: [ChartDataLabels]
+  mergedChart = new Chart(ctx, chartData[type]);
+
+  // Active button highlight
+  document.querySelectorAll('.chart-toggle').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.chart-toggle[data-target="${type}"]`).classList.add('active');
+}
+
+// Initial render
+renderChart('category');
+
+// Toggle buttons
+document.querySelectorAll('.chart-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    renderChart(btn.dataset.target);
   });
+});
 
-</script>
+// 🗑️ Delete button AJAX
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('delete-btn')) {
+    const id = e.target.dataset.id;
+    fetch(`/delete-expense/${id}/`).then(() => location.reload());
+  }
+});
 
-<!-- ⚙️ AJAX Script -->
-<script>
+// 🔽 Month Filter AJAX
 document.getElementById('month').addEventListener('change', function() {
-  const month = this.value;
-  fetch(`?month=${month}`)
+  fetch(`?month=${this.value}`)
     .then(res => res.text())
     .then(html => {
       const parser = new DOMParser();
@@ -201,15 +229,12 @@ document.getElementById('month').addEventListener('change', function() {
         doc.querySelector('#transactions-table').innerHTML;
     });
 });
-
-// 🗑️ Delete button with AJAX
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('delete-btn')) {
-    const id = e.target.getAttribute('data-id');
-    fetch(`/delete-expense/${id}/`)
-      .then(() => location.reload());
-  }
-});
 </script>
+
+<style>
+.chart-toggle.active {
+  border: 2px solid white;
+}
+</style>
 
 {% endblock %}

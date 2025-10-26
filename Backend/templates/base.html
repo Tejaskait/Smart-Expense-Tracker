@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Smart Expense Tracker{% endblock %}</title>
+<link rel="icon" href="{% static 'Sources/LogoSET.png' %}" type="image/png">
 
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -74,7 +75,7 @@ header {
   <header class="w-full py-6 px-6 md:px-12 flex items-center justify-between navbar-gradient navbar-shadow fixed top-0 left-0 z-50">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-xl font-bold">
-        <img src="{% static 'Sources/LogoSET.png' %}" alt="">
+        <img src="{% static 'Sources/LogoSET.png' %}" alt="Logo">
       </div>
       <h1 class="text-lg font-semibold tracking-tight">Smart Expense Tracker</h1>
     </div>

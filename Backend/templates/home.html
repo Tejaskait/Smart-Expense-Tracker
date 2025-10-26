@@ -42,12 +42,12 @@
       </button>
       <input type="file" id="uploadInput" accept="image/*" class="hidden">
 
-      <p class="text-white/70 text-center text-sm sm:text-base">Or Add Expense Manually</p>
     </div>
 
     <!-- Expense Form -->
     <form id="expenseForm" method="POST" action="{% url 'add_expense' %}" class="mt-6 flex flex-col gap-4 text-left relative">
       {% csrf_token %}
+       <h1 class="w-full text-center bg-blue-500 rounded-2xl p-4 ">Add Expense Manually</h1>
       <label class="text-sm font-medium">Select Date:</label>
       <input type="date" name="date" id="expense-date" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required/>
 
@@ -74,7 +74,7 @@
         <!-- Floating Success Modal -->
         <div id="floatingModal" class="absolute left-1/2 -translate-x-1/2 -top-20 opacity-0 transition-all duration-500 transform -translate-y-2 text-center p-3 rounded-lg bg-green-600 text-white font-semibold shadow-lg w-max sm:w-auto">
           ✅ Expense Added Successfully!
-          <button id="viewDashboardBtn" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium text-sm">
+          <button id="viewDashboardBtn" class="mt-2 px-4 py-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white font-medium text-sm">
             View Dashboard
           </button>
         </div>
@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (err) {
             console.error(err);
-            alert("❌ Upload failed. Check console.");
+            alert("❌ Upload failed. Try Again !");
         }
     });
 
