@@ -260,7 +260,8 @@ def upload_expense_image(request):
         - merchant
         - amount (numeric only)
         - date (YYYY-MM-DD)
-        Return strictly JSON: {"merchant": "", "amount": "", "date": ""} 
+        - category(Food,Travel,Shopping,Personal,Other if nothing matched)
+        Return strictly JSON: {"merchant": "", "amount": "", "date": "", "category": ""} 
         Do NOT include extra text.
         """
 
@@ -280,6 +281,7 @@ def upload_expense_image(request):
             data = {"merchant": "Unknown", "amount": 0.0, "date": str(datetime.today().date())}
 
         merchant = data.get("merchant", "Unknown")
+        category = data.get("category","Other")
         try:
             amount = float(str(data.get("amount", 0)).replace(",", "").strip())
         except ValueError:
@@ -295,8 +297,7 @@ def upload_expense_image(request):
             merchant=merchant,
             amount=amount,
             date=date_val,
-            category="Other",
-            image=image_file,
+            category=category,
             user=request.user
         )
 
