@@ -102,6 +102,16 @@ def login_view(request):
             return render(request, "registration/login.html", {"error": "Invalid credentials"})
     return render(request, "registration/login.html")
 
+@login_required
+def delete_account(request):
+    if request.method == "POST":
+        user = request.user
+        user.delete()
+        logout(request)
+        return redirect("home")
+    return render(request, "profile.html", {"user": request.user})
+
+
 
 # 🧾 Signup View
 def signup_view(request):
