@@ -26,65 +26,76 @@
 
 <!-- Upload / Add Expense Section -->
 <div id="upload-section" class="upload-section flex justify-center px-4 py-12">
-  <div class="w-full md:w-3/5 lg:w-2/5 p-6 glass-card rounded-2xl shadow-2xl text-center border border-white/10">
-    <!-- Image Upload Placeholder -->
-    <div class="w-full h-44 sm:h-48 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
-      <div class="flex flex-col items-center justify-center border-white rounded-2xl bg-white bg-opacity-20 p-4 gap-2">
-        <img src="{% static 'Sources/upload.png' %}" alt="Upload" class="w-24 sm:w-28">
-      </div>
-    </div>
+  <div class="w-full md:w-4/5 flex flex-col gap-6">
+    <div class="flex flex-col md:flex-row gap-6">
 
-    <!-- Upload & Manual Add Buttons -->
-    <div class="mt-4 flex flex-col gap-2 items-center">
-      <!-- ✅ Added auth guard -->
-      <button id="uploadImageBtn" class="h-14 px-4 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300 ">
-        Upload Payment Screenshot
-      </button>
-      <input type="file" id="uploadInput" accept="image/*" class="hidden">
-
-    </div>
-
-    <!-- Expense Form -->
-    <form id="expenseForm" method="POST" action="{% url 'add_expense' %}" class="mt-6 flex flex-col gap-4 text-left relative">
-      {% csrf_token %}
-       <h1 class="w-full text-center bg-blue-500 rounded-2xl p-4 ">Add Expense Manually</h1>
-      <label class="text-sm font-medium">Select Date:</label>
-      <input type="date" name="date" id="expense-date" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required/>
-
-      <label class="text-sm font-medium">Category:</label>
-      <select name="category" id="category" class="w-full p-3 rounded-lg glass-card text-white border border-white/10 bg-grey focus:ring-2 focus:ring-white/30 transition-all duration-300" required>
-        <option value="" disabled selected>Select category</option>
-        <option value="Food" class="text-black">🍽️ Food</option>
-        <option value="Travel" class="text-black">🚗 Travel</option>
-        <option value="Shopping" class="text-black">🛍️ Shopping</option>
-        <option value="Personal" class="text-black">💼 Personal</option>
-      </select>
-
-      <label class="text-sm font-medium">Amount:</label>
-      <input type="number" name="amount" id="amount" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required />
-
-      <label class="text-sm font-medium">Description:</label>
-      <input type="text" name="description" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required />
-
-      <button type="submit" class="w-full mt-6 relative">
-        <div id="addExpenseBtn" class="h-14 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
-          Add Expense
+      <!-- Left: Upload Screenshot -->
+      <div class="w-full md:w-1/2 p-6 glass-card rounded-2xl shadow-2xl text-center border border-white/10 justify-center items-center flex flex-col">
+        <div class="w-full h-44 sm:h-48 rounded-lg bg-gradient-to-br from-white/6 to-white/2 flex items-center justify-center">
+          <button id="uploadImageBtn" >
+          <div class="flex flex-col items-center justify-center border-white rounded-2xl bg-white bg-opacity-20 p-4 gap-2 hover:bg-opacity-50">
+           
+            <img src="{% static 'Sources/upload.png' %}" alt="Upload" class="w-24 sm:w-28"><input type="file" id="uploadInput" accept="image/*" class="hidden">
+          </div></button>
         </div>
+        <div class="mt-4 flex flex-col gap-2 items-center">
+          <button id="uploadImageBtn" class="h-14 px-4 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
+            Upload Payment Screenshot
+          </button>
+          <input type="file" id="uploadInput" accept="image/*" class="hidden">
+        </div>
+      </div>
 
+      <!-- Right: Add Expense Manually -->
+      <div class="w-full md:w-1/2 p-6 glass-card rounded-2xl shadow-2xl border border-white/10 relative">
         <!-- Floating Success Modal -->
-        <div id="floatingModal" class="absolute left-1/2 -translate-x-1/2 -top-20 opacity-0 transition-all duration-500 transform -translate-y-2 text-center p-3 rounded-lg bg-green-600 text-white font-semibold shadow-lg w-max sm:w-auto">
+        <div id="floatingModal" class="absolute left-1/2 -translate-x-1/2 bottom-20 opacity-0 transition-all duration-500 transform -translate-y-2 text-center p-3 rounded-lg bg-green-600 text-white font-semibold shadow-lg w-max sm:w-auto z-50">
           ✅ Expense Added Successfully!
-          <button id="viewDashboardBtn" class="mt-2 px-4 py-4 bg-blue-500 hover:bg-blue-700 rounded-lg text-white font-medium text-sm">
+          <button id="viewDashboardBtn" class="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-700 rounded-lg text-white font-medium text-sm">
             View Dashboard
           </button>
         </div>
-      </button>
-    </form>
+
+        <form id="expenseForm" method="POST" action="{% url 'add_expense' %}" class="flex flex-col gap-4 text-left">
+          {% csrf_token %}
+          
+          <label class="text-sm font-medium">Select Date:</label>
+          <input type="date" name="date" id="expense-date" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required/>
+
+          <label class="text-sm font-medium">Category:</label>
+          <select name="category" id="category" class="w-full p-3 rounded-lg glass-card text-white border border-white/10 bg-grey focus:ring-2 focus:ring-white/30 transition-all duration-300" required>
+            <option value="" disabled selected>Select category</option>
+            <option value="Food" class="text-black">🍽️ Food</option>
+            <option value="Travel" class="text-black">🚗 Travel</option>
+            <option value="Shopping" class="text-black">🛍️ Shopping</option>
+            <option value="Personal" class="text-black">💼 Personal</option>
+          </select>
+
+          <label class="text-sm font-medium">Amount:</label>
+          <input type="number" name="amount" id="amount" placeholder="Enter amount" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required/>
+
+          <label class="text-sm font-medium">Description:</label>
+          <input type="text" name="description" id="Description" placeholder="Enter Description" class="w-full p-3 rounded-lg glass-card text-white border border-white/10" required/>
+
+          <button type="submit" class="w-full mt-6">
+            <div id="addExpenseBtn" class="h-14 text-xl rounded-lg flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition duration-300">
+              Add Expense
+            </div>
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- View Dashboard Button Below Both -->
+    <div class="flex justify-center mt-4">
+      <a href="{% url 'dashboard' %}" class="px-8 py-3 rounded-lg font-medium bg-green-600 border border-white/20 hover:border-white/40">View Dashboard</a>
+    </div>
+
   </div>
 </div>
 
-
-<!-- ✅ LOGIN CHECK SCRIPT (paste before other JS) -->
+<!-- ✅ LOGIN CHECK SCRIPT -->
 <script>
   const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
   const loginUrl = "{% url 'login' %}";
@@ -176,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const uploadBtn = document.getElementById("uploadImageBtn");
     const uploadInput = document.getElementById("uploadInput");
 
     uploadInput.addEventListener("change", async (e) => {
@@ -203,22 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             alert(`✅ Expense Added!\nMerchant: ${data.merchant}\nAmount: ₹${data.amount}\nDate: ${data.date}`);
-
-            const tableBody = document.querySelector("#transactions-table tbody");
-            if (tableBody) {
-                const tr = document.createElement("tr");
-                tr.classList.add("border-b", "border-gray-700", "hover:bg-gray-800");
-                tr.innerHTML = `
-                    <td class="p-3">${data.date}</td>
-                    <td class="p-3">${data.category}</td>
-                    <td class="p-3">${data.merchant}</td>
-                    <td class="p-3">${data.amount}</td>
-                    <td class="p-3 text-center">
-                        <button class="text-red-400 hover:text-red-600 font-semibold delete-btn" data-id="${data.id}">Delete</button>
-                    </td>
-                `;
-                tableBody.prepend(tr);
-            }
 
         } catch (err) {
             console.error(err);
