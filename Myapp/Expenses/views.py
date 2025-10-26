@@ -249,6 +249,7 @@ def signup(request):
 
 # 📸 Upload Expense Image (Gemini OCR)
 @login_required
+@login_required
 def upload_expense_image(request):
     if request.method == "POST" and request.FILES.get("image"):
         image_file = request.FILES["image"]
@@ -262,51 +263,56 @@ def upload_expense_image(request):
         - date (YYYY-MM-DD)
         - category(Food,Travel,Shopping,Personal,Other if nothing matched)
         Return strictly JSON: {"merchant": "", "amount": "", "date": "", "category": ""} 
-        Do NOT include extra text.
         """
 
-        response = model.generate_content([
-            prompt,
-            {"mime_type": "image/jpeg", "data": image_bytes}
-        ])
-
-        raw_output = response.text.strip()
-        start = raw_output.find("{")
-        end = raw_output.rfind("}") + 1
-        json_str = raw_output[start:end] if start != -1 and end != -1 else "{}"
-
         try:
+            response = model.generate_content([
+                prompt,
+                {"mime_type": "image/jpeg", "data": image_bytes}
+            ])
+            raw_output = response.text.strip()
+            start = raw_output.find("{")
+            end = raw_output.rfind("}") + 1
+            json_str = raw_output[start:end] if start != -1 and end != -1 else "{}"
             data = json.loads(json_str)
-        except json.JSONDecodeError:
-            data = {"merchant": "Unknown", "amount": 0.0, "date": str(datetime.today().date())}
+        except Exception as e:
+            return JsonResponse({"error": f"OCR failed: {str(e)}"}, status=500)
 
+        # Just send extracted data — don't save yet
+        return JsonResponse({
+            "merchant": data.get("merchant", "Unknown"),
+            "amount": data.get("amount", ""),
+            "date": data.get("date", ""),
+            "category": data.get("category", "Other")
+        })
+
+    return JsonResponse({"error": "No image uploaded"}, status=400)
+
+@login_required
+def confirm_expense(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
         merchant = data.get("merchant", "Unknown")
-        category = data.get("category","Other")
+        category = data.get("category", "Other")
         try:
             amount = float(str(data.get("amount", 0)).replace(",", "").strip())
         except ValueError:
             amount = 0.0
 
-        date_str = str(data.get("date", "")).replace('"','').replace('“','').replace('”','')
         try:
-            date_val = datetime.strptime(date_str, "%Y-%m-%d").date()
+            date_val = datetime.strptime(data.get("date", ""), "%Y-%m-%d").date()
         except ValueError:
             date_val = datetime.today().date()
 
         expense = Expenses.objects.create(
             merchant=merchant,
+            category=category,
             amount=amount,
             date=date_val,
-            category=category,
             user=request.user
         )
 
-        return JsonResponse({
-            "id": expense.id,
-            "merchant": expense.merchant,
-            "amount": expense.amount,
-            "date": expense.date.strftime("%Y-%m-%d"),
-            "category": expense.category
-        })
+        return JsonResponse({"message": "Expense saved successfully!", "id": expense.id})
+    
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
-    return JsonResponse({"error": "No image uploaded"}, status=400)
