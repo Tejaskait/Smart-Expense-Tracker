@@ -24,7 +24,7 @@ Includes **weekly & monthly dashboards**, secure authentication, and a modular d
 
 ## 📦 Installation
 
-Clone the repository: git clone https://github.com/your-username/smart-expense-tracker.git
+Clone the repository: git clone https://github.com/tejas0937/Smart-Expense-Tracker/
 Install dependencies: pip install -r requirements.txt
 Run migrations: python manage.py migrate
 Start the development server: python manage.py runserver
