@@ -261,7 +261,7 @@ def upload_expense_image(request):
         - merchant
         - amount (numeric only)
         - date (YYYY-MM-DD)
-        - category(Food,Travel,Shopping,Personal,Other if nothing matched)
+        - category(Food,Travel,Shopping,Personal if nothing matched)
         Return strictly JSON: {"merchant": "", "amount": "", "date": "", "category": ""} 
         """
 
