@@ -161,7 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const minutes = now.getMinutes().toString().padStart(2,'0');
     const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     const day = days[now.getDay()];
-    const date = now.toLocaleDateString();
+    const date = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+
 
     timeSpan.textContent = `Time : ${hours}:${minutes} hrs`;
     daySpan.textContent = `Day : ${day}`;

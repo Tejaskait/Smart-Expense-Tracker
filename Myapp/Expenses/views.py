@@ -90,16 +90,42 @@ def delete_expense(request, expense_id):
 
 
 # 🔐 Login View
+
 def login_view(request):
+    """
+    Accepts POST with:
+      - identifier (email OR username)
+      - password
+    Tries email lookup first (case-insensitive). If found, it authenticates using that user's username.
+    Falls back to username-based authentication if email lookup fails.
+    Returns same 'error' key your template already expects.
+    """
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
+        identifier = request.POST.get("identifier", "").strip()
+        password = request.POST.get("password", "")
+
+        user = None
+
+        # If looks like an email, try to find user by email first
+        if "@" in identifier:
+            try:
+                user_obj = User.objects.get(email__iexact=identifier)
+                # authenticate requires username
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                user = None
+
+        # If not found/authenticated yet, try treating the identifier as username
+        if user is None:
+            user = authenticate(request, username=identifier, password=password)
+
         if user is not None:
             login(request, user)
             return redirect("dashboard")
         else:
-            return render(request, "registration/login.html", {"error": "Invalid credentials"})
+            # Keep same template behavior: return 'error' in context
+            return render(request, "registration/login.html", {"error": "Invalid credentials — try email/username and password."})
+
     return render(request, "registration/login.html")
 
 @login_required
@@ -260,7 +286,7 @@ def upload_expense_image(request):
         You are an OCR assistant. Extract from the uploaded receipt:
         - merchant
         - amount (numeric only)
-        - date (YYYY-MM-DD)
+        - date (DD-MM-YYYY)
         - category(Food,Travel,Shopping,Personal if nothing matched)
         Return strictly JSON: {"merchant": "", "amount": "", "date": "", "category": ""} 
         """
@@ -300,7 +326,7 @@ def confirm_expense(request):
             amount = 0.0
 
         try:
-            date_val = datetime.strptime(data.get("date", ""), "%Y-%m-%d").date()
+            date_val = datetime.strptime(data.get("date", ""), "%d-%m-%Y").date()
         except ValueError:
             date_val = datetime.today().date()
 
