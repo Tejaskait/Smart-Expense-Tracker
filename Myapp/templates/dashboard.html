@@ -19,9 +19,15 @@
       </a>
     </div>
 
+    <!-- 🧾 Remaining Balance Section (Updated) -->
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
       <h2 class="text-xl font-semibold mb-2">Remaining Balance</h2>
-      <p class="text-3xl font-bold text-green-400">₹{{ remaining_balance }}</p>
+      {% if remaining_balance < 0 %}
+        <p class="text-3xl font-bold text-red-500">₹{{ remaining_balance }}</p>
+        <p class="text-red-400 font-semibold mt-2">⚠️ You are running out of budget!</p>
+      {% else %}
+        <p class="text-3xl font-bold text-green-400">₹{{ remaining_balance }}</p>
+      {% endif %}
     </div>
 
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
@@ -48,23 +54,20 @@
       <canvas id="mergedChart" class="mx-auto"></canvas>
     </div>
 
-  <!-- 📋 Category Legend with Pie Chart Colors -->
-<div id="category-legend" class="mt-6">
-  <h3 class="text-xl font-semibold mb-4 text-center">Category-wise Totals</h3>
-  <div class="flex flex-wrap justify-center gap-4">
-    {% for label, value, color in category_totals %}
-    <div class="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded shadow-md">
-      <span class="w-4 h-4 rounded-full" style="background-color: {{ color }};"></span>
-      <span class="text-white font-semibold">{{ label }}: ₹{{ value }}</span>
+    <!-- 📋 Category Legend with Pie Chart Colors -->
+    <div id="category-legend" class="mt-6">
+      <h3 class="text-xl font-semibold mb-4 text-center">Category-wise Totals</h3>
+      <div class="flex flex-wrap justify-center gap-4">
+        {% for label, value, color in category_totals %}
+        <div class="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded shadow-md">
+          <span class="w-4 h-4 rounded-full" style="background-color: {{ color }};"></span>
+          <span class="text-white font-semibold">{{ label }}: ₹{{ value }}</span>
+        </div>
+        {% empty %}
+        <p class="text-gray-400 text-center w-full">No data found.</p>
+        {% endfor %}
+      </div>
     </div>
-    {% empty %}
-    <p class="text-gray-400 text-center w-full">No data found.</p>
-    {% endfor %}
-  </div>
-</div>
-
-
-
   </div>
 
   <!-- 🧾 Recent Transactions -->
