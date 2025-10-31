@@ -273,7 +273,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 resultBox.classList.remove("hidden");
 
                 // Auto-fill Add Expense form
-                if(data.date) expenseDateInput.value = data.date;
+                if (data.date) {
+  const parts = data.date.split(/[\/\-]/);
+  if (parts.length === 3) {
+    // Try converting DD/MM/YYYY or MM/DD/YYYY to YYYY-MM-DD
+    const [day, month, year] = parts.map(p => p.padStart(2, "0"));
+    if (year.length === 4) {
+      expenseDateInput.value = `${year}-${month}-${day}`;
+    } else {
+      expenseDateInput.value = data.date; // fallback if already ISO
+    }
+  } else {
+    expenseDateInput.value = data.date;
+  }
+}
                 if(data.amount) expenseAmountInput.value = data.amount;
                 if(data.category){
                 const normalizedCategory = data.category.trim().toLowerCase();
