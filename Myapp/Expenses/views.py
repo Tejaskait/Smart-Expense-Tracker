@@ -175,6 +175,11 @@ def dashboard(request):
     total_expenses = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
     monthly_budget = request.session.get("monthly_budget", 25000)
     remaining_balance = monthly_budget - total_expenses
+    # 📊 Percentage of budget spent
+    spent_percent = 0
+    if monthly_budget > 0:
+        spent_percent = round((total_expenses / monthly_budget) * 100, 1)
+
 
     # 📆 Monthly Expense Trend Data
     month_names, month_values = [], []
@@ -231,6 +236,8 @@ def dashboard(request):
         "total_expenses": total_expenses,
         "monthly_budget": monthly_budget,
         "remaining_balance": remaining_balance,
+        "spent_percent": spent_percent,
+
         "month_names": month_names,
         "month_values": month_values,
         "selected_month": selected_month or "all",

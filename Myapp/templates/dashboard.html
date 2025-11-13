@@ -21,25 +21,79 @@
 
     <!-- 🧾 Remaining Balance Section (Updated) -->
     <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 class="text-xl font-semibold mb-2">Remaining Balance</h2>
-      {% if remaining_balance < 0 %}
-        <p class="text-3xl font-bold text-red-500">₹{{ remaining_balance }}</p>
-        <p class="text-red-400 font-semibold mt-2">⚠️ You are running out of budget!</p>
-      {% else %}
-        <p class="text-3xl font-bold text-green-400">₹{{ remaining_balance }}</p>
-      {% endif %}
-    </div>
+  <h2 class="text-xl font-semibold mb-2">Remaining Balance</h2>
 
-    <div class="bg-gray-900 p-6 rounded-2xl shadow-md">
-      <h2 class="text-xl font-semibold mb-2">Monthly Budget</h2>
-      <form method="POST" action="{% url 'set_budget' %}" class="flex items-center gap-3">
-        {% csrf_token %}
-        <input type="number" name="budget" value="{{ monthly_budget }}" class="p-2 rounded bg-gray-800 text-white w-32"/>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold">
-          Set
-        </button>
-      </form>
+  {% if remaining_balance < 0 %}
+    <p class="text-3xl font-bold text-red-500">₹{{ remaining_balance }}</p>
+    <p class="text-red-400 font-semibold mt-2">⚠️ You are running out of budget!</p>
+  {% else %}
+    <p class="text-3xl font-bold text-green-400">₹{{ remaining_balance }}</p>
+  {% endif %}
+
+  <!-- 📊 Show % spent -->
+  <p class="mt-2 text-gray-400">
+    <span class="font-semibold text-blue-400">{{ spent_percent }}%</span> of your budget spent
+  </p>
+
+  <!-- 🟦 Progress Bar -->
+  <div class="w-full bg-gray-800 rounded-full h-3 mt-2">
+    <div
+      class="h-3 rounded-full transition-all duration-500 
+      {% if spent_percent < 70 %}
+        bg-green-500
+      {% elif spent_percent < 90 %}
+        bg-yellow-500
+      {% else %}
+        bg-red-500
+      {% endif %}"
+      style="width: {{ spent_percent }}%;">
     </div>
+  </div>
+</div>
+
+<!-- 💰 Set Monthly Budget Card -->
+<!-- 💼 Monthly Budget Card -->
+<div class="bg-gray-900 p-6 rounded-2xl shadow-md flex flex-col items-center justify-center text-center h-56 text-white">
+
+  <h2 class="text-xl font-semibold mb-3 text-gray-300">Monthly Budget</h2>
+
+  <!-- 💵 Current Budget -->
+  <p class="text-4xl font-bold text-green-400 mb-2">₹{{ monthly_budget }}</p>
+
+  <!-- ✨ Hidden Form -->
+  <form 
+    id="budgetForm"
+    action="{% url 'set_budget' %}" 
+    method="POST" 
+    class="hidden flex flex-col items-center gap-2 w-full transition-all duration-300"
+  >
+    {% csrf_token %}
+    <input 
+      type="number" 
+      name="budget" 
+      placeholder="Enter new budget (₹)" 
+      required 
+      class="w-3/4 px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+    />
+    <button 
+      type="submit" 
+      class="px-1 py-1 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium shadow-md transition duration-300 w-3/4"
+    >
+      Save
+    </button>
+  </form>
+
+  <!-- ⚙️ Toggle Button -->
+  <button 
+    id="toggleBudgetBtn"
+    class="mt-2 px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold shadow-md transition duration-300"
+  >
+    Set New Budget
+  </button>
+
+</div>
+
+
   </div>
 
   <!-- 📊 Chart Section with Toggle -->
@@ -230,6 +284,21 @@ document.getElementById('month').addEventListener('change', function() {
       document.querySelector('#transactions-table').innerHTML =
         doc.querySelector('#transactions-table').innerHTML;
     });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("toggleBudgetBtn");
+  const form = document.getElementById("budgetForm");
+
+  toggleBtn.addEventListener("click", () => {
+    form.classList.toggle("hidden");
+    if (!form.classList.contains("hidden")) {
+      toggleBtn.textContent = "Cancel";
+    } else {
+      toggleBtn.textContent = "Set New Budget";
+    }
+  });
 });
 </script>
 
