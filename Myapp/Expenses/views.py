@@ -349,3 +349,42 @@ def confirm_expense(request):
     
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+
+import re
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+
+EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+
+def signup_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        # 1️⃣ Check email format using regex
+        if not EMAIL_REGEX.match(email):
+            return render(request, "registration/signup.html", {
+                "error": "⚠ Invalid email format. Please enter a valid email."
+            })
+
+        # 2️⃣ Check if email already exists
+        if User.objects.filter(email=email).exists():
+            return render(request, "registration/signup.html", {
+                "error": "⚠ Email already in use."
+            })
+
+        # 3️⃣ Create the user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        # Auto login after signup
+        login(request, user)
+
+        return redirect("home")  # change to your homepage route
+
+    return render(request, "registration/signup.html")
