@@ -21,6 +21,7 @@
       transition: all 0.3s ease;
       cursor: pointer;
       pointer-events: auto;
+      z-index: 200;
     }
 
     .nav-btn:hover {
@@ -35,6 +36,7 @@
     .curved-lines,
     .curved-lines path {
         pointer-events: none !important;
+         z-index: -1 !important;
     }
 
     header {
@@ -44,12 +46,27 @@
         width: 100%;
         z-index: 100;
     }
-  </style>
+    #hamburgerBtn {
+    position: relative;
+    z-index: 200 !important;
+}
+
+#mobileMenu {
+    position: relative;
+    z-index: 150 !important;
+}
+
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden !important;
+  }
+</style>
+
 
   {% block extra_head %}{% endblock %}
 </head>
 
-<body class="min-h-screen font-sans text-white relative">
+<body class="min-h-screen font-sans text-white relative overflow-x-hidden">
 
   <!-- Animated Background -->
   <div class="animated-gradient" aria-hidden="true"></div>
